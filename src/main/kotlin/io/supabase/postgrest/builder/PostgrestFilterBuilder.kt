@@ -1,6 +1,6 @@
 package io.supabase.postgrest.builder
 
-import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
 
 class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestTransformBuilder<T>(builder) {
 
@@ -11,9 +11,13 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param operator  The operator to filter with.
      * @param value  The value to filter with.
      */
-    fun not(column: KProperty<T>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "not.${operator.identifier}.${value}")
+    fun not(column: String, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "not.${operator.identifier}.${value}")
         return this
+    }
+
+    fun not(column: KProperty1<T, Any>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
+        return not(column.name, operator, value)
     }
 
     /**
@@ -26,6 +30,10 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
         return this
     }
 
+    fun eq(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
+        return eq(column.name, value)
+    }
+
     /**
      * Finds all rows whose value on the stated "column" exactly matches the
      * specified "value".
@@ -33,8 +41,14 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun eq(column: KProperty<T>, value: Any): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "eq.${value}")
+    fun eq(column: String, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "eq.${value}")
+        return this
+    }
+
+
+    fun neq(column: String, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "neq.${value}")
         return this
     }
 
@@ -45,8 +59,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun neq(column: KProperty<T>, value: T): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "neq.${value}")
+    fun neq(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
+        return neq(column.name, value)
+    }
+
+    fun gt(column: String, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "gt.${value}")
         return this
     }
 
@@ -57,8 +75,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun gt(column: KProperty<T>, value: T): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "gt.${value}")
+    fun gt(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
+        return gt(column.name, value)
+    }
+
+    fun gte(column: String, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "gte.${value}")
         return this
     }
 
@@ -69,8 +91,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun gte(column: KProperty<T>, value: T): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "gte.${value}")
+    fun gte(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
+        return gte(column.name, value)
+    }
+
+    fun lt(column: String, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "lt.${value}")
         return this
     }
 
@@ -81,8 +107,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun lt(column: KProperty<T>, value: T): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "lt.${value}")
+    fun lt(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
+        return lt(column.name, value)
+    }
+
+    fun lte(column: String, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "lte.${value}")
         return this
     }
 
@@ -93,8 +123,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun lte(column: KProperty<T>, value: T): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "lte.${value}")
+    fun lte(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
+        return lte(column.name, value)
+    }
+
+    fun like(column: String, pattern: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "like.${pattern}")
         return this
     }
 
@@ -105,8 +139,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param pattern  The pattern to filter with.
      */
-    fun like(column: KProperty<T>, pattern: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "like.${pattern}")
+    fun like(column: KProperty1<T, Any>, pattern: String): PostgrestFilterBuilder<T> {
+        return like(column.name, pattern)
+    }
+
+    fun ilike(column: String, pattern: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "ilike.${pattern}")
         return this
     }
 
@@ -117,8 +155,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param pattern  The pattern to filter with.
      */
-    fun ilike(column: KProperty<T>, pattern: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "ilike.${pattern}")
+    fun ilike(column: KProperty1<T, Any>, pattern: String): PostgrestFilterBuilder<T> {
+        return ilike(column.name, pattern)
+    }
+
+    fun `is`(column: String, value: Boolean?): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "is.${value}")
         return this
     }
 
@@ -129,8 +171,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param value  The value to filter with.
      */
-    fun `is`(column: KProperty<T>, value: Boolean?): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "is.${value}")
+    fun `is`(column: KProperty1<T, Any>, value: Boolean?): PostgrestFilterBuilder<T> {
+        return `is`(column.name, value)
+    }
+
+    fun `in`(column: String, values: List<Any>): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "in.(${cleanFilterArray(values)})")
         return this
     }
 
@@ -141,13 +187,17 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param values  The values to filter with.
      */
-    fun `in`(column: KProperty<T>, values: List<Any>): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "in.(${cleanFilterArray(values)})")
-        return this
+    fun `in`(column: KProperty1<T, Any>, values: List<Any>): PostgrestFilterBuilder<T> {
+        return `in`(column.name, values)
     }
 
     private fun cleanFilterArray(values: List<Any>): String {
         return values.joinToString(",") { s -> """"$s"""" }
+    }
+
+    fun rangeLt(column: String, range: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "sl.${range}")
+        return this
     }
 
     /**
@@ -157,8 +207,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param range  The range to filter with.
      */
-    fun sl(column: KProperty<T>, range: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "sl.${range}")
+    fun rangeLt(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
+        return rangeLt(column.name, range)
+    }
+
+    fun rangeGt(column: String, range: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "sr.${range}")
         return this
     }
 
@@ -169,8 +223,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param range  The range to filter with.
      */
-    fun sr(column: KProperty<T>, range: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "sr.${range}")
+    fun rangeGt(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
+        return rangeGt(column.name, range)
+    }
+
+    fun rangeGte(column: String, range: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "nxl.${range}")
         return this
     }
 
@@ -181,8 +239,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param range  The range to filter with.
      */
-    fun nxl(column: KProperty<T>, range: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "nxl.${range}")
+    fun rangeGte(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
+        return rangeGte(column.name, range)
+    }
+
+    fun rangeLte(column: String, range: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "nxr.${range}")
         return this
     }
 
@@ -193,8 +255,12 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param range  The range to filter with.
      */
-    fun nxr(column: KProperty<T>, range: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "nxr.${range}")
+    fun rangeLte(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
+        return rangeLte(column.name, range)
+    }
+
+    fun adjacent(column: String, range: String): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "adj.${range}")
         return this
     }
 
@@ -205,64 +271,22 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param column  The column to filter on.
      * @param range  The range to filter with.
      */
-    fun adj(column: KProperty<T>, range: String): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "adj.${range}")
+    fun adjacent(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
+        return adjacent(column.name, range)
+    }
+
+    fun textSearch(column: String, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder<T> {
+        val configPart = if (config === null) "" else "(${config})"
+        setSearchParam(column, "${textSearchType.identifier}${configPart}.${query}")
         return this
     }
 
-    /**
-     * Finds all rows whose tsvector value on the stated "column" matches
-     * to_tsquery("query").
-     *
-     * @param column  The column to filter on.
-     * @param query  The Postgres tsquery String to filter with.
-     * @param config  The text search configuration to use.
-     */
-    fun fts(column: KProperty<T>, query: String, config: String? = null): PostgrestFilterBuilder<T> {
-        val configPart = if (config === null) "" else "(${config})"
-        setSearchParam(column.name, "fts${configPart}.${query}")
-        return this
+    fun textSearch(column: KProperty1<T, Any>, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder<T> {
+        return textSearch(column.name, query, textSearchType, config)
     }
 
-    /**
-     * Finds all rows whose tsvector value on the stated "column" matches
-     * plainto_tsquery("query").
-     *
-     * @param column  The column to filter on.
-     * @param query  The Postgres tsquery String to filter with.
-     * @param config  The text search configuration to use.
-     */
-    fun plfts(column: KProperty<T>, query: String, config: String? = null): PostgrestFilterBuilder<T> {
-        val configPart = if (config === null) "" else "(${config})"
-        setSearchParam(column.name, "plfts${configPart}.${query}")
-        return this
-    }
-
-    /**
-     * Finds all rows whose tsvector value on the stated "column" matches
-     * phraseto_tsquery("query").
-     *
-     * @param column  The column to filter on.
-     * @param query  The Postgres tsquery String to filter with.
-     * @param config  The text search configuration to use.
-     */
-    fun phfts(column: KProperty<T>, query: String, config: String? = null): PostgrestFilterBuilder<T> {
-        val configPart = if (config === null) "" else "(${config})"
-        setSearchParam(column.name, "phfts${configPart}.${query}")
-        return this
-    }
-
-    /**
-     * Finds all rows whose tsvector value on the stated "column" matches
-     * websearch_to_tsquery("query").
-     *
-     * @param column  The column to filter on.
-     * @param query  The Postgres tsquery String to filter with.
-     * @param config  The text search configuration to use.
-     */
-    fun wfts(column: KProperty<T>, query: String, config: String? = null): PostgrestFilterBuilder<T> {
-        val configPart = if (config === null) "" else "(${config})"
-        setSearchParam(column.name, "wfts${configPart}.${query}")
+    fun filter(column: String, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
+        setSearchParam(column, "${operator.identifier}.${value}")
         return this
     }
 
@@ -273,9 +297,8 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param operator  The operator to filter with.
      * @param value  The value to filter with.
      */
-    fun filter(column: KProperty<T>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
-        setSearchParam(column.name, "${operator.identifier}.${value}")
-        return this
+    fun filter(column: KProperty1<T, Any>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
+        return filter(column.name, operator, value)
     }
 }
 
@@ -302,4 +325,11 @@ enum class FilterOperator(val identifier: String) {
     PLFTS("plfts"),
     PHFTS("phfts"),
     WFTS("wfts"),
+}
+
+enum class TextSearchType(val identifier: String) {
+    TSVECTOR("tsvector"),
+    PLAINTO("plainto"),
+    PHRASETO("phraseto"),
+    WEBSEARCH("websearch")
 }

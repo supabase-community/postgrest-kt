@@ -51,8 +51,12 @@ open class PostgrestBuilder<T : Any> {
     fun execute(): HttpResponse {
         checkNotNull(method) { "Method cannot be null" }
 
+        val uriParams = searchParams.entries.joinToString("&") { (name,value) -> "$name=$value" }
+
+        val uriWithParams = URI("${this.url}?${uriParams}")
+
         return postgrestHttpClient.execute(
-                url = url,
+                url = uriWithParams,
                 method = method!!,
                 headers = headers,
                 body = body,

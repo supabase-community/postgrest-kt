@@ -80,6 +80,13 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
 
         return PostgrestFilterBuilder(this)
     }
+
+    fun rpc(params: Any?): PostgrestBuilder<T> {
+        setMethod(Method.POST)
+        setBody(params)
+        return this
+    }
+
 }
 
 enum class Count(val identifier: String) {
