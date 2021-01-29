@@ -300,6 +300,11 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
     fun filter(column: KProperty1<T, Any>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
         return filter(column.name, operator, value)
     }
+
+    fun match(query: Map<String, Any>): PostgrestFilterBuilder<T> {
+        query.entries.forEach { (name, value) -> setSearchParam(name, "eq.$value") }
+        return this
+    }
 }
 
 enum class FilterOperator(val identifier: String) {
