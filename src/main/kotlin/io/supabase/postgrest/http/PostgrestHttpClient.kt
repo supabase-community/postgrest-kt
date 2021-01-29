@@ -11,15 +11,14 @@ import java.net.URI
 interface PostgrestHttpClient {
 
     fun execute(
-            url: URI,
+            uri: URI,
             method: Method,
             headers: Map<String, String> = emptyMap(),
-            body: Any? = null,
-            schema: String? = null,
-    ): HttpResponse
+            body: Any? = null
+    ): PostgrestHttpResponse
 }
 
-data class HttpResponse(
+data class PostgrestHttpResponse(
         val status: Int,
         val body: String?
 )

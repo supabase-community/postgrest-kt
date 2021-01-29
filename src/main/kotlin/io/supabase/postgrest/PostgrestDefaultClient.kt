@@ -22,6 +22,7 @@ class PostgrestDefaultClient(
                 httpClient = HttpClients.createDefault(),
                 postgrestJsonConverter = jsonConverter
         ),
+        jsonConverter = jsonConverter,
         defaultHeaders = defaultHeaders,
         uri = uri
 )

@@ -21,9 +21,9 @@ class PostgrestHttpClientApache(
         private val postgrestJsonConverter: PostgrestJsonConverter
 ) : PostgrestHttpClient {
 
-    override fun execute(url: URI, method: Method, headers: Map<String, String>, body: Any?, schema: String?): HttpResponse {
+    override fun execute(uri: URI, method: Method, headers: Map<String, String>, body: Any?): PostgrestHttpResponse {
         return httpClient.use { httpClient ->
-            val httpRequest = HttpUriRequestBase(method.name, url)
+            val httpRequest = HttpUriRequestBase(method.name, uri)
             body?.apply {
                 val dataAsString = postgrestJsonConverter.serialize(body)
                 httpRequest.entity = StringEntity(dataAsString)
@@ -34,13 +34,13 @@ class PostgrestHttpClientApache(
         }
     }
 
-    private fun responseHandler(): HttpClientResponseHandler<HttpResponse> {
-        return HttpClientResponseHandler<HttpResponse> { response ->
+    private fun responseHandler(): HttpClientResponseHandler<PostgrestHttpResponse> {
+        return HttpClientResponseHandler<PostgrestHttpResponse> { response ->
             throwIfError(response)
 
             val body = response.entity?.let { EntityUtils.toString(it) }
 
-            return@HttpClientResponseHandler HttpResponse(
+            return@HttpClientResponseHandler PostgrestHttpResponse(
                     status = response.code,
                     body = body
             )

@@ -1,9 +1,7 @@
 package io.supabase.postgrest.json
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
@@ -25,6 +23,13 @@ class PostgrestJsonConverterJackson : PostgrestJsonConverter {
 
     override fun <T : Any> deserialize(text: String, responseType: Class<T>): T {
         return objectMapper.readValue(text, responseType)
+    }
+
+    override fun <T : Any> deserializeList(text: String, java: Class<T>): List<T> {
+        val javaType = objectMapper.typeFactory
+                .constructCollectionType(MutableList::class.java, java)
+
+        return objectMapper.readValue(text, javaType)
     }
 }
 

@@ -1,10 +1,12 @@
 package io.supabase.postgrest.builder
 
 import io.supabase.postgrest.http.PostgrestHttpClient
+import io.supabase.postgrest.json.PostgrestJsonConverter
 import org.apache.hc.core5.http.Method
 import java.net.URI
 
-class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHttpClient, defaultHeaders: Map<String, String>) : PostgrestBuilder<T>(url, postgrestHttpClient, defaultHeaders) {
+class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, defaultHeaders: Map<String, String>)
+    : PostgrestBuilder<T>(url, postgrestHttpClient, jsonConverter, defaultHeaders) {
 
     /**
      * Performs vertical filtering with SELECT.
