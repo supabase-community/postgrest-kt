@@ -6,15 +6,18 @@ import java.net.URI
 class PostgresClientTest {
 
     @Test
-    fun foo() {
+    fun `if it looks stupid but works it aint stupid`() {
         val client = PostgrestDefaultClient(
                 uri = URI("https://eyimuvrqyphojiqwapfv.supabase.co/rest/v1"),
-                defaultHeaders = mapOf("apiKey" to "xyz")
+                headers = mapOf("apiKey" to "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxMTQ0NTk4OCwiZXhwIjoxOTI3MDIxOTg4fQ.OW1kc8pmB7Q9EO9iUSdg86cZoyx_3rLoQUJrQg35Bvs")
         )
 
-        val a = client.from<Foo>("foo")
+        val dataAsList = client.from<Foo>("foo")
                 .select()
-                .execute()
+                .eq(Foo::text, "asdasd")
+                .executeAndGetList<Foo>()
+
+        println(dataAsList)
     }
 }
 

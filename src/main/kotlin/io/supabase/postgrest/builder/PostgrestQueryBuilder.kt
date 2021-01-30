@@ -5,8 +5,8 @@ import io.supabase.postgrest.json.PostgrestJsonConverter
 import org.apache.hc.core5.http.Method
 import java.net.URI
 
-class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, defaultHeaders: Map<String, String>)
-    : PostgrestBuilder<T>(url, postgrestHttpClient, jsonConverter, defaultHeaders) {
+class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, defaultHeaders: Map<String, String>, schema: String?)
+    : PostgrestBuilder<T>(url, postgrestHttpClient, jsonConverter, defaultHeaders, schema) {
 
     /**
      * Performs vertical filtering with SELECT.
@@ -37,14 +37,22 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
         return PostgrestFilterBuilder(this)
     }
 
-    fun insert(value: List<T>, upsert: Boolean = false, onConflict: String? = null, returning: Returning = Returning.REPRESENTATION, count: Count?): PostgrestFilterBuilder<T> {
+    /**
+     * Performs an INSERT into the table.
+     *
+     * @param[values] The values to insert.
+     * @param[upsert] If `true`, performs an UPSERT.
+     * @param[onConflict] By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
+     * @param[returning] By default the new record is returned. Set this to 'minimal' if you don't need this value.
+     */
+    fun insert(values: List<T>, upsert: Boolean = false, onConflict: String? = null, returning: Returning = Returning.REPRESENTATION, count: Count? = null): PostgrestFilterBuilder<T> {
         setMethod(Method.POST)
 
         val preferHeaders = mutableListOf<String>("return=${returning.identifier}")
         if (upsert) preferHeaders.add("resolution=merge-duplicates")
 
         if (upsert && onConflict != null) setSearchParam("on_conflict", onConflict)
-        setBody(value)
+        setBody(values)
 
         if (count != null) {
             preferHeaders.add("count=${count}")
@@ -55,14 +63,30 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
         return PostgrestFilterBuilder(this)
     }
 
-    fun insert(value: T, upsert: Boolean = false, onConflict: String? = null, returning: Returning = Returning.REPRESENTATION, count: Count?): PostgrestFilterBuilder<T> {
+    /**
+     * Performs an INSERT into the table.
+     *
+     * @param[value] The value to insert.
+     * @param[upsert] If `true`, performs an UPSERT.
+     * @param[onConflict] By specifying the `on_conflict` query parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
+     * @param[returning] By default the new record is returned. Set this to 'minimal' if you don't need this value.
+     */
+    fun insert(value: T, upsert: Boolean = false, onConflict: String? = null, returning: Returning = Returning.REPRESENTATION, count: Count? = null): PostgrestFilterBuilder<T> {
         return insert(listOf(value), upsert, onConflict, returning, count)
     }
 
+    /**
+     * Performs an UPDATE on the table.
+     *
+     * @param[value] The values to update.
+     * @param[returning] By default the updated record is returned. Set this to 'minimal' if you don't need this value.
+     */
     fun update(value: Any, returning: Returning = Returning.REPRESENTATION, count: Count?): PostgrestFilterBuilder<T> {
         setMethod(Method.PATCH)
-        val prefersHeaders = mutableListOf("return=${returning.identifier}")
         setBody(value)
+
+        val prefersHeaders = mutableListOf("return=${returning.identifier}")
+
         if (count != null) {
             prefersHeaders.add("count=${count}")
         }
@@ -71,6 +95,11 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
         return PostgrestFilterBuilder(this)
     }
 
+    /**
+     * Performs a DELETE on the table.
+     *
+     * @param[returning] If `true`, return the deleted row(s) in the response.
+     */
     fun delete(returning: Returning = Returning.REPRESENTATION, count: Count?): PostgrestFilterBuilder<T> {
         setMethod(Method.DELETE)
 
@@ -83,7 +112,7 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
         return PostgrestFilterBuilder(this)
     }
 
-    fun rpc(params: Any?): PostgrestBuilder<T> {
+    internal fun rpc(params: Any?): PostgrestBuilder<T> {
         setMethod(Method.POST)
         setBody(params)
         return this

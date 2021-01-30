@@ -24,7 +24,13 @@ interface PostgrestJsonConverter {
      */
     fun <T : Any> deserialize(text: String, responseType: Class<T>): T
 
-    fun <T : Any> deserializeList(text: String, java: Class<T>): List<T>
+    /**
+     * Deserializes a JSON [text] to a list of the corresponding [responseType].
+     *
+     * @param[text] The JSON text to convert
+     * @param[responseType] The response type as Java class
+     */
+    fun <T : Any> deserializeList(text: String, responseType: Class<T>): List<T>
 }
 
 inline fun <reified T : Any> PostgrestJsonConverter.deserialize(content: String): T = deserialize(content, T::class.java)

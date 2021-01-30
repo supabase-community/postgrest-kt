@@ -12,6 +12,7 @@ open class PostgrestBuilder<T : Any> {
     val jsonConverter: PostgrestJsonConverter
     private val url: URI
 
+    private var schema: String? = null
     private var headers: MutableMap<String, String> = mutableMapOf()
     private var method: Method? = null
     private var body: Any? = null
@@ -24,14 +25,16 @@ open class PostgrestBuilder<T : Any> {
         this.url = builder.url
         this.body = builder.body
         this.jsonConverter = builder.jsonConverter
+        this.schema = schema
     }
 
-    constructor(url: URI, httpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, defaultHeaders: Map<String, String>) {
+    constructor(url: URI, httpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, headers: Map<String, String>, schema: String?) {
         this.url = url
         this.httpClient = httpClient
         this.jsonConverter = jsonConverter
+        this.schema = schema
 
-        defaultHeaders.forEach { (name, value) -> setHeader(name, value) }
+        headers.forEach { (name, value) -> setHeader(name, value) }
     }
 
     protected fun setHeader(name: String, value: String) {
@@ -52,6 +55,19 @@ open class PostgrestBuilder<T : Any> {
 
     fun execute(): PostgrestHttpResponse {
         checkNotNull(method) { "Method cannot be null" }
+
+        // https://postgrest.org/en/stable/api.html#switching-schemas
+        if (schema != null) {
+            // skip
+            if (this.method in listOf(Method.GET, Method.HEAD)) {
+                setHeader("Accept-Profile", this.schema!!)
+            } else {
+                setHeader("Content-Profile", this.schema!!)
+            }
+            if (this.method != Method.GET && this.method != Method.HEAD) {
+                setHeader("Content-Type", "application/json")
+            }
+        }
 
         val uriParams = searchParams.entries.joinToString("&") { (name, value) -> "$name=$value" }
 

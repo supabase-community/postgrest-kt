@@ -6,11 +6,21 @@ import io.supabase.postgrest.http.PostgrestHttpClient
 import io.supabase.postgrest.json.PostgrestJsonConverter
 import java.net.URI
 
+/**
+ * Main client and entry point for using PostgREST client.
+ *
+ * @param[uri] URL of the PostgREST endpoint.
+ * @param[headers] Custom headers.
+ * @param[schema] Postgres schema to switch to.
+ * @param[httpClient] Implementation of the [PostgrestHttpClient] interface.
+ * @param[jsonConverter] Implementation of the [PostgrestJsonConverter] interface
+ */
 open class PostgrestClient(
         private val uri: URI,
-        private val postgrestHttpClient: PostgrestHttpClient,
-        private val jsonConverter: PostgrestJsonConverter,
-        private val defaultHeaders: Map<String, String> = emptyMap()
+        private val headers: Map<String, String> = emptyMap(),
+        private val schema: String? = null,
+        private val httpClient: PostgrestHttpClient,
+        private val jsonConverter: PostgrestJsonConverter
 ) {
 
     /**
@@ -20,13 +30,19 @@ open class PostgrestClient(
      */
     fun <T : Any> from(table: String): PostgrestQueryBuilder<T> {
         val uri = URI("$uri/$table")
-        return PostgrestQueryBuilder(uri, postgrestHttpClient, jsonConverter, defaultHeaders)
+        return PostgrestQueryBuilder(uri, httpClient, jsonConverter, headers, schema)
     }
 
+    /**
+     * Perform a stored procedure call.
+     *
+     * @param[fn] The function name to call.
+     * @param[params] The parameters to pass to the function call.
+     */
     fun <T : Any> rpc(fn: String, params: Any?): PostgrestBuilder<T> {
         val uri = URI("${this.uri}/rpc/${fn}")
 
-        return PostgrestQueryBuilder<T>(uri, postgrestHttpClient, jsonConverter, defaultHeaders).rpc(params)
+        return PostgrestQueryBuilder<T>(uri, httpClient, jsonConverter, headers, schema).rpc(params)
     }
 
 }

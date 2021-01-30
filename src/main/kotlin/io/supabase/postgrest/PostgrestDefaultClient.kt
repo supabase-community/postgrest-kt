@@ -13,16 +13,22 @@ val jsonConverter = PostgrestJsonConverterJackson()
  * The default client uses Apache HTTP client 5.x and Jackson FasterXML for DTO conversion.
  *
  * If you want to customize, implement [PostgrestHttpClient] and [PostgrestJsonConverter].
+ *
+ * @param[uri] URL of the PostgREST endpoint.
+ * @param[headers] Custom headers.
+ * @param[schema] Postgres schema to switch to.
  */
 class PostgrestDefaultClient(
         uri: URI,
-        defaultHeaders: Map<String, String> = emptyMap()
+        headers: Map<String, String> = emptyMap(),
+        schema: String? = null
 ) : PostgrestClient(
-        postgrestHttpClient = PostgrestHttpClientApache(
+        uri = uri,
+        headers = headers,
+        schema = schema,
+        httpClient = PostgrestHttpClientApache(
                 httpClient = HttpClients.createDefault(),
                 postgrestJsonConverter = jsonConverter
         ),
-        jsonConverter = jsonConverter,
-        defaultHeaders = defaultHeaders,
-        uri = uri
+        jsonConverter = jsonConverter
 )

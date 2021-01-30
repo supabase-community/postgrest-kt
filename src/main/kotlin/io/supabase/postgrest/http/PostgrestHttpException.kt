@@ -6,6 +6,6 @@ package io.supabase.postgrest.http
  * If you implement your custom PostgrestHttpClient, you need to handle exceptions on your own.
  *
  * @property[status] HTTP status code
- * @property[httpBody] Response body as [String] if available
+ * @property[data] Response body as [String] if available
  */
-class PostgrestHttpException(val status: Int, val httpBody: String?) : RuntimeException("Unexpected response status: $status")
+class PostgrestHttpException(val status: Int, val data: String?) : RuntimeException("Unexpected response status: $status")

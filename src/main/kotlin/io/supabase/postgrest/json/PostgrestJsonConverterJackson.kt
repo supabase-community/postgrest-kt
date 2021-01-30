@@ -25,9 +25,9 @@ class PostgrestJsonConverterJackson : PostgrestJsonConverter {
         return objectMapper.readValue(text, responseType)
     }
 
-    override fun <T : Any> deserializeList(text: String, java: Class<T>): List<T> {
+    override fun <T : Any> deserializeList(text: String, responseType: Class<T>): List<T> {
         val javaType = objectMapper.typeFactory
-                .constructCollectionType(MutableList::class.java, java)
+                .constructCollectionType(MutableList::class.java, responseType)
 
         return objectMapper.readValue(text, javaType)
     }
