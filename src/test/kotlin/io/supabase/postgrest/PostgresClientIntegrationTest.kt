@@ -1,22 +1,17 @@
 package io.supabase.postgrest
 
 import assertk.assertThat
-import assertk.assertions.containsAll
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
-import com.fasterxml.jackson.annotation.JsonProperty
+import io.supabase.postgrest.builder.Count
 import org.junit.ClassRule
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.io.File
 import java.net.URI
 import java.sql.Connection
 import java.sql.DriverManager
-import java.time.LocalDate
 
 @Testcontainers
 open class PostgresClientIntegrationTest {
@@ -64,36 +59,114 @@ open class PostgresClientIntegrationTest {
     }
 
     @Test
-    fun `should insert and fetch single`() {
-        val user = testUser()
-
-        postgrestClient.from<User>(tableUsers)
-                .insert(user)
-                .execute()
-
+    fun `should fetch single`() {
         val userFromPostgrest = postgrestClient.from<User>(tableUsers)
                 .select()
-                .eq(User::username, user.username)
+                .eq(User::username, "supabot")
                 .single()
                 .executeAndGetSingle<User>()
 
-        assertThat(userFromPostgrest).isEqualTo(user)
+        assertThat(userFromPostgrest).isEqualTo(
+                User(
+                        username = "supabot",
+                        status = "ONLINE",
+                        age_range = "[1,2)",
+                        catchphrase = "'cat' 'fat'",
+                        data = null
+                )
+        )
     }
 
     @Test
-    fun `should insert and fetch multiple`() {
-        val user1 = testUser()
-        val user2 = user1.copy(username = "kevcodez2")
-
-        postgrestClient.from<User>(tableUsers)
-                .insert(listOf(user1, user2))
-                .execute()
-
+    fun `should fetch multiple`() {
         val usersFromPostgrest = postgrestClient.from<User>(tableUsers)
                 .select()
                 .executeAndGetList<User>()
 
-        assertThat(usersFromPostgrest).containsAll(user1, user2)
+        assertThat(usersFromPostgrest).hasSize(4)
+    }
+
+    @Nested
+    inner class InsertUpdateDelete {
+
+        @Test
+        fun `basic insert`() {
+            val message = mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1)
+            postgrestClient.from<Any>("messages")
+                    .insert(message)
+                    .execute()
+
+            val dataFromPostgres = postgrestClient.from<Any>("messages")
+                    .select()
+                    .eq("message", "foo")
+                    .limit(1)
+                    .single()
+                    .executeAndGetSingle<Map<String, Any>>()
+
+            assertk.assertAll {
+                message.forEach { (key, value) -> assertThat(dataFromPostgres[key]).isEqualTo(value) }
+            }
+        }
+
+        @Test
+        fun `upsert`() {
+            val updatedMessage = mapOf("id" to 3, "message" to "foo", "username" to "supabot", "channel_id" to 1)
+            postgrestClient.from<Any>("messages")
+                    .insert(
+                            value = updatedMessage,
+                            upsert = true
+                    )
+                    .execute()
+
+            val dataFromPostgres = postgrestClient.from<Any>("messages")
+                    .select()
+                    .eq("id", 3)
+                    .limit(1)
+                    .single()
+                    .executeAndGetSingle<Map<String, Any>>()
+
+            assertk.assertAll {
+                updatedMessage.forEach { (key, value) -> assertThat(dataFromPostgres[key]).isEqualTo(value) }
+            }
+        }
+
+        @Test
+        fun `bulk insert`() {
+            postgrestClient.from<Any>("messages")
+                    .insert(
+                            values = listOf(
+                                    mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1),
+                                    mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1),
+                            )
+                    )
+
+            val response = postgrestClient.from<Any>("messages")
+                    .select(count = Count.EXACT)
+                    .execute()
+
+            // TODO
+        }
+
+        @Test
+        fun `basic update`() {
+// TODO
+        }
+
+        @Test
+        fun `basic delete`() {
+// TODO
+        }
+
+    }
+
+    @Test
+    fun `select with head`() {
+        // TODO
+    }
+
+    @Test
+    fun `stored procedure`() {
+        // TODO
     }
 
     private fun testUser(): User {
@@ -123,6 +196,6 @@ data class User(
         val age_range: String?,
 
         val status: String,
-        val catchphrase : String?
+        val catchphrase: String?
 
 )

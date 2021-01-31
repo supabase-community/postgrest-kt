@@ -30,19 +30,24 @@ class PostgrestHttpClientApache(
             }
             headers.forEach { (name, value) -> httpRequest.addHeader(name, value) }
 
-            return@use httpClient.execute(httpRequest, responseHandler())
+            return@use httpClient.execute(httpRequest, responseHandler(headers))
         }
     }
 
-    private fun responseHandler(): HttpClientResponseHandler<PostgrestHttpResponse> {
+    private fun responseHandler(requestHeaders: Map<String, String>): HttpClientResponseHandler<PostgrestHttpResponse> {
         return HttpClientResponseHandler<PostgrestHttpResponse> { response ->
             throwIfError(response)
 
             val body = response.entity?.let { EntityUtils.toString(it) }
 
+            val responseHeaders = response.headers.map { it.name to it.value }.toMap()
+
+            val count = extractCount(responseHeaders, requestHeaders)
+
             return@HttpClientResponseHandler PostgrestHttpResponse(
                     status = response.code,
-                    body = body
+                    body = body,
+                    count = count
             )
         }
     }
