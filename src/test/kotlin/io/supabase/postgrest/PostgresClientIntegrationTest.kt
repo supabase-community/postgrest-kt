@@ -3,6 +3,7 @@ package io.supabase.postgrest
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
 import io.supabase.postgrest.builder.Count
 import org.junit.ClassRule
 import org.junit.jupiter.api.*
@@ -184,12 +185,19 @@ open class PostgresClientIntegrationTest {
 
     @Test
     fun `select with head`() {
-        // TODO
+        val response = postgrestClient.from<Any>("users")
+                .select(head = true)
+                .execute()
+
+        assertThat(response.body).isNull()
     }
 
     @Test
     fun `stored procedure`() {
-        // TODO
+        val response = postgrestClient.rpc<Any>("get_status", mapOf("name_param" to "supabot"))
+                .execute()
+
+        assertThat(response.body).isEqualTo("""[{"get_status":"ONLINE"}]""")
     }
 
     private fun testUser(): User {
