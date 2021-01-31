@@ -1,18 +1,18 @@
 package io.supabase.postgrest.builder
 
 /**
- * Remove whitespaces except when quoted
+ * Remove whitespaces except when quoted.
  */
 fun cleanColumns(columns: String): String {
     var quoted = false
 
     return columns
-            .split("")
+            .toCharArray()
             .map { character ->
-                if (character.matches(Regex("\\s")) && !quoted) {
+                if (character.isWhitespace() && !quoted) {
                     return@map ""
                 }
-                if (character == "\"") {
+                if (character == '"') {
                     quoted = !quoted
                 }
 

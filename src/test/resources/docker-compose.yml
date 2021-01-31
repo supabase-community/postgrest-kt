@@ -1,7 +1,7 @@
 version: '3'
 services:
   server:
-    image: postgrest/postgrest
+    image: postgrest/postgrest:v7.0.1
     ports:
       - "3111:3000"
     links:
@@ -21,7 +21,3 @@ services:
       POSTGRES_USER: app_user
       POSTGRES_PASSWORD: password
       POSTGRES_HOST_AUTH_METHOD: trust
-
-networks:
-  local:
-    driver: bridge
