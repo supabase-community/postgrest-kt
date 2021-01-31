@@ -81,7 +81,7 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
      * @param[value] The values to update.
      * @param[returning] By default the updated record is returned. Set this to 'minimal' if you don't need this value.
      */
-    fun update(value: Any, returning: Returning = Returning.REPRESENTATION, count: Count?): PostgrestFilterBuilder<T> {
+    fun update(value: Any, returning: Returning = Returning.REPRESENTATION, count: Count? = null): PostgrestFilterBuilder<T> {
         setMethod(Method.PATCH)
         setBody(value)
 
@@ -100,7 +100,7 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
      *
      * @param[returning] If `true`, return the deleted row(s) in the response.
      */
-    fun delete(returning: Returning = Returning.REPRESENTATION, count: Count?): PostgrestFilterBuilder<T> {
+    fun delete(returning: Returning = Returning.REPRESENTATION, count: Count? = null): PostgrestFilterBuilder<T> {
         setMethod(Method.DELETE)
 
         val prefersHeaders = mutableListOf("return=${returning.identifier}")

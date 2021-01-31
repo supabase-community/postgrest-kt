@@ -7,6 +7,8 @@ import org.apache.hc.core5.http.ContentType
 import org.apache.hc.core5.http.HttpHeaders
 import org.apache.hc.core5.http.Method
 import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 open class PostgrestBuilder<T : Any> {
 
@@ -72,7 +74,7 @@ open class PostgrestBuilder<T : Any> {
             setHeader(HttpHeaders.CONTENT_TYPE,  ContentType.APPLICATION_JSON.mimeType)
         }
 
-        val uriParams = searchParams.entries.joinToString("&") { (name, value) -> "$name=$value" }
+        val uriParams = searchParams.entries.joinToString("&") { (name, value) -> "$name=${URLEncoder.encode(value, StandardCharsets.UTF_8)}" }
 
         val uriWithParams = URI("${this.url}?${uriParams}")
 

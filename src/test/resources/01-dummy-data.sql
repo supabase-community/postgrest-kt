@@ -16,7 +16,7 @@ INSERT INTO
     public.messages (message, channel_id, username)
 VALUES
     ('Hello World 👋', 1, 'supabot'),
-    ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, 'supabot');
+    ('Perfection is attained.', 2, 'supabot');
 
 INSERT INTO
     personal.users (username, status, age_range)

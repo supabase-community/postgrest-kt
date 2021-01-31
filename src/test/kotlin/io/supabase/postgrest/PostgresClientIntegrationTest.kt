@@ -139,24 +139,47 @@ open class PostgresClientIntegrationTest {
                                     mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1),
                             )
                     )
+                    .execute()
 
             val response = postgrestClient.from<Any>("messages")
                     .select(count = Count.EXACT)
                     .execute()
 
-            // TODO
+            assertThat(response.count).isEqualTo(4)
         }
 
         @Test
         fun `basic update`() {
-// TODO
+            val updateValues = mapOf("data" to mapOf("foo" to 1))
+
+            postgrestClient.from<Any>("messages")
+                    .update(updateValues)
+                    .eq("message", "Perfection is attained.")
+                    .execute()
+
+            val updatedEntry = postgrestClient.from<Any>("messages")
+                    .select()
+                    .eq("message", "Perfection is attained.")
+                    .limit(1)
+                    .single()
+                    .executeAndGetSingle<Map<String, Any>>()
+
+            assertThat(updatedEntry["data"]).isEqualTo(updateValues["data"])
         }
 
         @Test
         fun `basic delete`() {
-// TODO
-        }
+            postgrestClient.from<Any>("messages")
+                    .delete()
+                    .eq("message", "Perfection is attained.")
+                    .execute()
 
+            val response = postgrestClient.from<Any>("messages")
+                    .select(count = Count.EXACT)
+                    .execute()
+
+            assertThat(response.count).isEqualTo(1)
+        }
     }
 
     @Test
