@@ -3,7 +3,6 @@ package io.supabase.postgrest.http
 import io.supabase.postgrest.json.PostgrestJsonConverter
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
-import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.core5.http.ClassicHttpResponse
 import org.apache.hc.core5.http.HttpStatus
 import org.apache.hc.core5.http.Method
@@ -19,14 +18,14 @@ import java.net.URI
  */
 class PostgrestHttpClientApache(
         private val httpClient: () -> CloseableHttpClient,
-        private val postgrestJsonConverter: PostgrestJsonConverter
+        private val jsonConverter: PostgrestJsonConverter
 ) : PostgrestHttpClient {
 
     override fun execute(uri: URI, method: Method, headers: Map<String, String>, body: Any?): PostgrestHttpResponse {
         return httpClient().use { httpClient ->
             val httpRequest = HttpUriRequestBase(method.name, uri)
             body?.apply {
-                val dataAsString = postgrestJsonConverter.serialize(body)
+                val dataAsString = jsonConverter.serialize(body)
                 httpRequest.entity = StringEntity(dataAsString)
             }
             headers.forEach { (name, value) -> httpRequest.addHeader(name, value) }

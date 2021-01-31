@@ -48,7 +48,7 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
     fun insert(values: List<T>, upsert: Boolean = false, onConflict: String? = null, returning: Returning = Returning.REPRESENTATION, count: Count? = null): PostgrestFilterBuilder<T> {
         setMethod(Method.POST)
 
-        val preferHeaders = mutableListOf<String>("return=${returning.identifier}")
+        val preferHeaders = mutableListOf("return=${returning.identifier}")
         if (upsert) preferHeaders.add("resolution=merge-duplicates")
 
         if (upsert && onConflict != null) setSearchParam("on_conflict", onConflict)
