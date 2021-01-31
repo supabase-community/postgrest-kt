@@ -28,15 +28,19 @@ dependencies {
     // Align versions of all Kotlin components
     implementation platform('org.jetbrains.kotlin:kotlin-bom')
 
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.12.1"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.1"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
-    testImplementation "io.mockk:mockk:1.10.5"
-    testImplementation 'com.willowtreeapps.assertk:assertk-jvm:0.23'
+    testCompile "org.testcontainers:testcontainers:1.15.1"
+    testCompile "org.testcontainers:junit-jupiter:1.15.1"
     testCompile "com.github.tomakehurst:wiremock-jre8:2.27.2"
+    testImplementation "io.mockk:mockk:1.10.5"
+    testImplementation "com.willowtreeapps.assertk:assertk-jvm:0.23"
+    testImplementation "org.slf4j:slf4j-simple:1.7.30"
+    testImplementation "org.postgresql:postgresql:42.2.18"
 
 }
 

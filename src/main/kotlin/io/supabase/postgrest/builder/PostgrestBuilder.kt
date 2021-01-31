@@ -3,6 +3,8 @@ package io.supabase.postgrest.builder
 import io.supabase.postgrest.http.PostgrestHttpClient
 import io.supabase.postgrest.http.PostgrestHttpResponse
 import io.supabase.postgrest.json.PostgrestJsonConverter
+import org.apache.hc.core5.http.ContentType
+import org.apache.hc.core5.http.HttpHeaders
 import org.apache.hc.core5.http.Method
 import java.net.URI
 
@@ -62,11 +64,12 @@ open class PostgrestBuilder<T : Any> {
             if (this.method in listOf(Method.GET, Method.HEAD)) {
                 setHeader("Accept-Profile", this.schema!!)
             } else {
-                setHeader("Content-Profile", this.schema!!)
+                setHeader(HttpHeaders.CONTENT_TYPE, this.schema!!)
             }
-            if (this.method != Method.GET && this.method != Method.HEAD) {
-                setHeader("Content-Type", "application/json")
-            }
+        }
+
+        if (this.method != Method.GET && this.method != Method.HEAD) {
+            setHeader(HttpHeaders.CONTENT_TYPE,  ContentType.APPLICATION_JSON.mimeType)
         }
 
         val uriParams = searchParams.entries.joinToString("&") { (name, value) -> "$name=$value" }

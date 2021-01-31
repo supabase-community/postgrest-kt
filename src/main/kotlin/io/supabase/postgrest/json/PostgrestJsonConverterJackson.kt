@@ -2,6 +2,7 @@ package io.supabase.postgrest.json
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
@@ -16,6 +17,7 @@ class PostgrestJsonConverterJackson : PostgrestJsonConverter {
             .registerModule(KotlinModule())
             .registerModule(JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 
     override fun serialize(data: Any): String {
         return objectMapper.writeValueAsString(data)

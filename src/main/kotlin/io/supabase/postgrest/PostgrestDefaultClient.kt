@@ -27,8 +27,8 @@ class PostgrestDefaultClient(
         headers = headers,
         schema = schema,
         httpClient = PostgrestHttpClientApache(
-                httpClient = HttpClients.createDefault(),
-                postgrestJsonConverter = jsonConverter
+                postgrestJsonConverter = jsonConverter,
+                httpClient = { HttpClients.createDefault() }
         ),
         jsonConverter = jsonConverter
 )
