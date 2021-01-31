@@ -19,7 +19,7 @@ import java.sql.DriverManager
 import java.time.LocalDate
 
 @Testcontainers
-class PostgresClientTest {
+open class PostgresClientIntegrationTest {
 
     // Docker compose setup to run Postgres + PostgREST
     companion object {
@@ -54,19 +54,13 @@ class PostgresClientTest {
     @BeforeEach
     fun setupDatabase() {
         dbConnection().use { connection ->
-            executeSql(connection, "DROP SCHEMA public CASCADE;")
-            executeSql(connection, "CREATE SCHEMA public;")
-
-            executeSql(connection, """
-            CREATE TABLE $tableUsers(
-                id BIGINT PRIMARY KEY,
-                name VARCHAR NOT NULL,
-                birthday DATE NOT NULL,
-                twitter_followers BIGINT NOT NULL
-            );
-        """)
+            executeSql(connection, loadResourceContent("/00-schema.sql"))
+            executeSql(connection, loadResourceContent("/01-dummy-data.sql"))
         }
+    }
 
+    private fun loadResourceContent(path: String): String {
+        return PostgresClientIntegrationTest::class.java.getResource(path).readText()
     }
 
     @Test
@@ -79,7 +73,7 @@ class PostgresClientTest {
 
         val userFromPostgrest = postgrestClient.from<User>(tableUsers)
                 .select()
-                .eq(User::name, user.name)
+                .eq(User::username, user.username)
                 .single()
                 .executeAndGetSingle<User>()
 
@@ -89,7 +83,7 @@ class PostgresClientTest {
     @Test
     fun `should insert and fetch multiple`() {
         val user1 = testUser()
-        val user2 = user1.copy(id = 2L, name = "something-else")
+        val user2 = user1.copy(username = "kevcodez2")
 
         postgrestClient.from<User>(tableUsers)
                 .insert(listOf(user1, user2))
@@ -99,8 +93,17 @@ class PostgresClientTest {
                 .select()
                 .executeAndGetList<User>()
 
-        assertThat(usersFromPostgrest).hasSize(2)
         assertThat(usersFromPostgrest).containsAll(user1, user2)
+    }
+
+    private fun testUser(): User {
+        return User(
+                username = "kevcodez",
+                data = emptyMap(),
+                age_range = null,
+                status = "ONLINE",
+                catchphrase = null
+        )
     }
 
     private fun executeSql(connection: Connection, sql: String): Boolean {
@@ -112,22 +115,14 @@ class PostgresClientTest {
     private fun dbConnection(): Connection {
         return DriverManager.getConnection("jdbc:postgresql://localhost:5999/app_db?loginTimeout=10&socketTimeout=10&ssl=false", "app_user", "password")
     }
-
-    private fun testUser(): User {
-        return User(
-                id = 1,
-                name = "kevcodez",
-                birthday = LocalDate.now(),
-                twitterFollowers = 4
-        )
-    }
 }
 
 data class User(
-        val id: Long,
-        val name: String,
-        val birthday: LocalDate,
+        val username: String,
+        val data: Map<String, Any>?,
+        val age_range: String?,
 
-        @JsonProperty("twitter_followers")
-        val twitterFollowers: Int
+        val status: String,
+        val catchphrase : String?
+
 )

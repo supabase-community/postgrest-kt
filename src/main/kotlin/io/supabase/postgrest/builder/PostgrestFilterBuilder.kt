@@ -24,7 +24,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun not(column: KProperty1<T, Any>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
-        return not(column.name, operator, value)
+        return not(column.columnName, operator, value)
     }
 
     /**
@@ -45,7 +45,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun eq(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
-        return eq(column.name, value)
+        return eq(column.columnName, value)
     }
 
     /**
@@ -80,7 +80,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun neq(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
-        return neq(column.name, value)
+        return neq(column.columnName, value)
     }
 
     /**
@@ -103,7 +103,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun gt(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
-        return gt(column.name, value)
+        return gt(column.columnName, value)
     }
 
     /**
@@ -126,7 +126,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun gte(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
-        return gte(column.name, value)
+        return gte(column.columnName, value)
     }
 
     /**
@@ -149,7 +149,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun lt(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
-        return lt(column.name, value)
+        return lt(column.columnName, value)
     }
 
     /**
@@ -172,7 +172,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun lte(column: KProperty1<T, Any>, value: Any): PostgrestFilterBuilder<T> {
-        return lte(column.name, value)
+        return lte(column.columnName, value)
     }
 
     /**
@@ -195,7 +195,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[pattern] The pattern to filter with.
      */
     fun like(column: KProperty1<T, Any>, pattern: String): PostgrestFilterBuilder<T> {
-        return like(column.name, pattern)
+        return like(column.columnName, pattern)
     }
 
     /**
@@ -218,7 +218,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[pattern] The pattern to filter with.
      */
     fun ilike(column: KProperty1<T, Any>, pattern: String): PostgrestFilterBuilder<T> {
-        return ilike(column.name, pattern)
+        return ilike(column.columnName, pattern)
     }
 
     /**
@@ -241,7 +241,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun `is`(column: KProperty1<T, Any>, value: Boolean?): PostgrestFilterBuilder<T> {
-        return `is`(column.name, value)
+        return `is`(column.columnName, value)
     }
 
     /**
@@ -264,7 +264,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[values] The values to filter with.
      */
     fun `in`(column: KProperty1<T, Any>, values: List<Any>): PostgrestFilterBuilder<T> {
-        return `in`(column.name, values)
+        return `in`(column.columnName, values)
     }
 
     private fun cleanFilterArray(values: List<Any>): String {
@@ -291,7 +291,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[range] The range to filter with.
      */
     fun rangeLt(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
-        return rangeLt(column.name, range)
+        return rangeLt(column.columnName, range)
     }
 
     /**
@@ -314,7 +314,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[range] The range to filter with.
      */
     fun rangeGt(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
-        return rangeGt(column.name, range)
+        return rangeGt(column.columnName, range)
     }
 
     /**
@@ -337,7 +337,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[range] The range to filter with.
      */
     fun rangeGte(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
-        return rangeGte(column.name, range)
+        return rangeGte(column.columnName, range)
     }
 
     /**
@@ -360,7 +360,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[range] The range to filter with.
      */
     fun rangeLte(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
-        return rangeLte(column.name, range)
+        return rangeLte(column.columnName, range)
     }
 
     /**
@@ -383,7 +383,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[range] The range to filter with.
      */
     fun adjacent(column: KProperty1<T, Any>, range: String): PostgrestFilterBuilder<T> {
-        return adjacent(column.name, range)
+        return adjacent(column.columnName, range)
     }
 
     /**
@@ -402,7 +402,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
     }
 
     fun textSearch(column: KProperty1<T, Any>, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder<T> {
-        return textSearch(column.name, query, textSearchType, config)
+        return textSearch(column.columnName, query, textSearchType, config)
     }
 
     /**
@@ -425,7 +425,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
      * @param[value] The value to filter with.
      */
     fun filter(column: KProperty1<T, Any>, operator: FilterOperator, value: Any): PostgrestFilterBuilder<T> {
-        return filter(column.name, operator, value)
+        return filter(column.columnName, operator, value)
     }
 
     /**
@@ -436,6 +436,10 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
     fun match(query: Map<String, Any>): PostgrestFilterBuilder<T> {
         query.entries.forEach { (name, value) -> setSearchParam(name, "eq.$value") }
         return this
+    }
+
+    private val KProperty1<T, Any>.columnName : String get() {
+        return this.name.toLowerCase()
     }
 }
 
