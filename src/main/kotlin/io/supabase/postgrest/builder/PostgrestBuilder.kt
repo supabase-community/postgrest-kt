@@ -74,7 +74,7 @@ open class PostgrestBuilder<T : Any> {
             setHeader(HttpHeaders.CONTENT_TYPE,  ContentType.APPLICATION_JSON.mimeType)
         }
 
-        val uriParams = searchParams.entries.joinToString("&") { (name, value) -> "$name=${URLEncoder.encode(value, StandardCharsets.UTF_8)}" }
+        val uriParams = searchParams.entries.joinToString("&") { (name, value) -> "$name=${URLEncoder.encode(value, StandardCharsets.UTF_8.name())}" }
 
         val uriWithParams = URI("${this.url}?${uriParams}")
 
