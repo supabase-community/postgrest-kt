@@ -2,6 +2,10 @@
 
 Kotlin JVM client for [PostgREST](https://postgrest.org/)
 
+![Java CI with Gradle](https://img.shields.io/github/workflow/status/supabase/postgrest-kt/Java%20CI%20with%20Gradle?label=BUILD&style=for-the-badge)
+![Gradle Package](https://img.shields.io/github/workflow/status/supabase/postgrest-kt/Gradle%20Package?label=PUBLISH&style=for-the-badge)
+![Bintray](https://img.shields.io/bintray/v/supabase/supabase/postgrest-kt?style=for-the-badge)
+
 ## Installation
 
 Maven
