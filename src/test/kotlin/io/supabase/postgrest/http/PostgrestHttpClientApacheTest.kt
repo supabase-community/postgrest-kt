@@ -43,6 +43,7 @@ internal class PostgrestHttpClientApacheTest {
         val httpResponse = mockk<CloseableHttpResponse>()
         every { httpResponse.code } returns 200
         every { httpResponse.entity } returns null
+        every { httpResponse.headers } returns emptyArray()
 
         val requestCapture = mockHttpCallWithGetRequest(httpResponse)
 
