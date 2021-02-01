@@ -18,8 +18,3 @@ interface PostgrestHttpClient {
     ): PostgrestHttpResponse
 }
 
-data class PostgrestHttpResponse(
-        val status: Int,
-        val body: String?,
-        val count: Long?
-)
