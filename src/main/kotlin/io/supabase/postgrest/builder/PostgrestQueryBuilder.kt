@@ -8,6 +8,10 @@ import java.net.URI
 class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, defaultHeaders: Map<String, String>, schema: String?)
     : PostgrestBuilder<T>(url, postgrestHttpClient, jsonConverter, defaultHeaders, schema) {
 
+    companion object {
+        const val HEADER_PREFER = "Prefer"
+    }
+
     /**
      * Performs vertical filtering with SELECT.
      *
@@ -20,18 +24,18 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
             head: Boolean = false,
             count: Count? = null
     ): PostgrestFilterBuilder<T> {
-        setMethod(Method.GET)
+        if (head) {
+            setMethod(Method.HEAD)
+        } else {
+            setMethod(Method.GET)
+        }
 
         val cleanedColumns = cleanColumns(columns)
 
         setSearchParam("select", cleanedColumns)
 
         if (count != null) {
-            setHeader("Prefer", "count=${count.identifier}")
-        }
-
-        if (head) {
-            setMethod(Method.HEAD)
+            setHeader(HEADER_PREFER, "count=${count.identifier}")
         }
 
         return PostgrestFilterBuilder(this)
@@ -55,10 +59,10 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
         setBody(values)
 
         if (count != null) {
-            preferHeaders.add("count=${count}")
+            preferHeaders.add("count=${count.identifier}")
         }
 
-        setHeader("Prefer", preferHeaders.joinToString(","))
+        setHeader(HEADER_PREFER, preferHeaders.joinToString(","))
 
         return PostgrestFilterBuilder(this)
     }
@@ -88,9 +92,9 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
         val prefersHeaders = mutableListOf("return=${returning.identifier}")
 
         if (count != null) {
-            prefersHeaders.add("count=${count}")
+            prefersHeaders.add("count=${count.identifier}")
         }
-        setHeader("Prefer", prefersHeaders.joinToString(","))
+        setHeader(HEADER_PREFER, prefersHeaders.joinToString(","))
 
         return PostgrestFilterBuilder(this)
     }
@@ -105,9 +109,9 @@ class PostgrestQueryBuilder<T : Any>(url: URI, postgrestHttpClient: PostgrestHtt
 
         val prefersHeaders = mutableListOf("return=${returning.identifier}")
         if (count != null) {
-            prefersHeaders.add("count=${count}")
+            prefersHeaders.add("count=${count.identifier}")
         }
-        setHeader("Prefer", prefersHeaders.joinToString(","))
+        setHeader(HEADER_PREFER, prefersHeaders.joinToString(","))
 
         return PostgrestFilterBuilder(this)
     }

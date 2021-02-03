@@ -61,6 +61,18 @@ open class PostgrestBuilder<T : Any> {
         return searchParams
     }
 
+    fun getBody(): Any? {
+        return this.body
+    }
+
+    fun getHeaders(): Map<String, String> {
+        return this.headers
+    }
+
+    fun getMethod(): Method? {
+        return this.method
+    }
+
     fun execute(): PostgrestHttpResponse {
         checkNotNull(method) { "Method cannot be null" }
 
