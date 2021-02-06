@@ -1,6 +1,6 @@
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id 'org.jetbrains.kotlin.jvm' version '1.4.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.30'
 
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
@@ -36,7 +36,7 @@ dependencies {
     testCompile "org.testcontainers:testcontainers:1.15.1"
     testCompile "org.testcontainers:junit-jupiter:1.15.1"
     testCompile "com.github.tomakehurst:wiremock-jre8:2.27.2"
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
     testImplementation "io.mockk:mockk:1.10.5"
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:0.23"
     testImplementation "org.slf4j:slf4j-simple:1.7.30"

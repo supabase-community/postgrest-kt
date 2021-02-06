@@ -1,5 +1,6 @@
 package io.supabase.postgrest.builder
 
+import org.apache.hc.core5.http.HttpHeaders.*
 import kotlin.reflect.KProperty1
 
 open class PostgrestTransformBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestBuilder<T>(builder) {
@@ -82,7 +83,7 @@ open class PostgrestTransformBuilder<T : Any>(builder: PostgrestBuilder<T>) : Po
      * otherwise this will result in an error.
      */
     fun single(): PostgrestTransformBuilder<T> {
-        setHeader(org.apache.hc.core5.http.HttpHeaders.ACCEPT, "application/vnd.pgrst.object+json")
+        setHeader(ACCEPT, "application/vnd.pgrst.object+json")
 
         return this
     }
