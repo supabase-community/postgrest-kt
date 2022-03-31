@@ -1,21 +1,27 @@
-package io.supabase.postgrest.builder
+import io.mockative.Mock
+import io.mockative.classOf
+import io.mockative.mock
+import io.supabase.postgrest.builder.FilterOperator
+import io.supabase.postgrest.builder.PostgrestBuilder
+import io.supabase.postgrest.builder.PostgrestFilterBuilder
+import io.supabase.postgrest.builder.TextSearchType
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-import assertk.assertThat
-import assertk.assertions.isEqualTo
-import io.mockk.mockk
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import kotlin.reflect.KProperty1
+class PostgrestFilterBuilderTest {
 
-internal class PostgrestFilterBuilderTest {
+    @property:Mock
+    private val sstt = mock(classOf<String>())
 
-    private val postgrestBuilderMock = mockk<PostgrestBuilder<Any>>()
+    val postgrestBuilderMock: PostgrestBuilder<Any> = mock(classOf())
     private var filterBuilder: PostgrestFilterBuilder<Any>? = null
 
-    @BeforeEach
-    fun beforeEach() {
-        filterBuilder = PostgrestFilterBuilder(postgrestBuilderMock)
-    }
+//    @BeforeTest
+//    fun beforeEach() {
+//        sstt
+//
+//        filterBuilder = PostgrestFilterBuilder(postgrestBuilderMock)
+//    }
 
     @Test
     fun not() {
@@ -66,13 +72,13 @@ internal class PostgrestFilterBuilderTest {
     }
 
     @Test
-    fun like(){
+    fun like() {
         filterBuilder!!.like("columnName", "val")
         assertSearchParam("columnName", "like.val")
     }
 
     @Test
-    fun ilike (){
+    fun ilike() {
         filterBuilder!!.ilike("columnName", "val")
         assertSearchParam("columnName", "ilike.val")
     }
@@ -102,13 +108,13 @@ internal class PostgrestFilterBuilderTest {
     }
 
     @Test
-    fun rangeGte(){
+    fun rangeGte() {
         filterBuilder!!.rangeGte("columnName", "val")
         assertSearchParam("columnName", "nxl.val")
     }
 
     @Test
-    fun rangeLte(){
+    fun rangeLte() {
         filterBuilder!!.rangeLte("columnName", "val")
         assertSearchParam("columnName", "nxr.val")
     }
@@ -120,38 +126,38 @@ internal class PostgrestFilterBuilderTest {
     }
 
     @Test
-    fun `text search without config`() {
-        filterBuilder!!.textSearch("columnName", "val" ,TextSearchType.PHRASETO)
+    fun text_search_without_config() {
+        filterBuilder!!.textSearch("columnName", "val", TextSearchType.PHRASETO)
         assertSearchParam("columnName", "phraseto.val")
     }
 
     @Test
-    fun `text search with config`() {
-        filterBuilder!!.textSearch("columnName", "val" ,TextSearchType.PHRASETO, "config")
+    fun text_search_with_config() {
+        filterBuilder!!.textSearch("columnName", "val", TextSearchType.PHRASETO, "config")
         assertSearchParam("columnName", "phraseto(config).val")
     }
 
     @Test
-    fun `text search phrase to`() {
-        filterBuilder!!.textSearch("columnName", "val" ,TextSearchType.PHRASETO)
+    fun text_search_phrase_to() {
+        filterBuilder!!.textSearch("columnName", "val", TextSearchType.PHRASETO)
         assertSearchParam("columnName", "phraseto.val")
     }
 
     @Test
-    fun `text search plain to`() {
-        filterBuilder!!.textSearch("columnName", "val" ,TextSearchType.PLAINTO)
+    fun text_search_plain_to() {
+        filterBuilder!!.textSearch("columnName", "val", TextSearchType.PLAINTO)
         assertSearchParam("columnName", "plainto.val")
     }
 
     @Test
-    fun `text search tsvector`() {
-        filterBuilder!!.textSearch("columnName", "val" ,TextSearchType.TSVECTOR)
+    fun text_search_tsvector() {
+        filterBuilder!!.textSearch("columnName", "val", TextSearchType.TSVECTOR)
         assertSearchParam("columnName", "tsvector.val")
     }
 
     @Test
-    fun `text search websearch`() {
-        filterBuilder!!.textSearch("columnName", "val" ,TextSearchType.WEBSEARCH)
+    fun text_search_websearch() {
+        filterBuilder!!.textSearch("columnName", "val", TextSearchType.WEBSEARCH)
         assertSearchParam("columnName", "websearch.val")
     }
 
@@ -169,7 +175,7 @@ internal class PostgrestFilterBuilderTest {
     }
 
     private fun assertSearchParam(name: String, value: String) {
-        val searchParams = filterBuilder!!.getSearchParams()
-        assertThat(searchParams[name]).isEqualTo(value)
+        val searchParams = filterBuilder!!.searchParams
+        assertEquals(searchParams[name], value)
     }
 }
