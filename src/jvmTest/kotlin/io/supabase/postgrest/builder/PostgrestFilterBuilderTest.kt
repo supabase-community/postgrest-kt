@@ -1,27 +1,19 @@
-import io.mockative.Mock
-import io.mockative.classOf
-import io.mockative.mock
-import io.supabase.postgrest.builder.FilterOperator
-import io.supabase.postgrest.builder.PostgrestBuilder
-import io.supabase.postgrest.builder.PostgrestFilterBuilder
-import io.supabase.postgrest.builder.TextSearchType
-import kotlin.test.Test
+package io.supabase.postgrest.builder
+
+import io.mockk.mockk
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class PostgrestFilterBuilderTest {
+internal class PostgrestFilterBuilderTest {
 
-    @property:Mock
-    private val sstt = mock(classOf<String>())
-
-    val postgrestBuilderMock: PostgrestBuilder<Any> = mock(classOf())
+    private val postgrestBuilderMock = mockk<PostgrestBuilder<Any>>(relaxed = true)
     private var filterBuilder: PostgrestFilterBuilder<Any>? = null
 
-//    @BeforeTest
-//    fun beforeEach() {
-//        sstt
-//
-//        filterBuilder = PostgrestFilterBuilder(postgrestBuilderMock)
-//    }
+    @BeforeEach
+    fun beforeEach() {
+        filterBuilder = PostgrestFilterBuilder(postgrestBuilderMock)
+    }
 
     @Test
     fun not() {
@@ -126,37 +118,37 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
-    fun text_search_without_config() {
+    fun `text search without config`() {
         filterBuilder!!.textSearch("columnName", "val", TextSearchType.PHRASETO)
         assertSearchParam("columnName", "phraseto.val")
     }
 
     @Test
-    fun text_search_with_config() {
+    fun `text search with config`() {
         filterBuilder!!.textSearch("columnName", "val", TextSearchType.PHRASETO, "config")
         assertSearchParam("columnName", "phraseto(config).val")
     }
 
     @Test
-    fun text_search_phrase_to() {
+    fun `text search phrase to`() {
         filterBuilder!!.textSearch("columnName", "val", TextSearchType.PHRASETO)
         assertSearchParam("columnName", "phraseto.val")
     }
 
     @Test
-    fun text_search_plain_to() {
+    fun `text search plain to`() {
         filterBuilder!!.textSearch("columnName", "val", TextSearchType.PLAINTO)
         assertSearchParam("columnName", "plainto.val")
     }
 
     @Test
-    fun text_search_tsvector() {
+    fun `text search tsvector`() {
         filterBuilder!!.textSearch("columnName", "val", TextSearchType.TSVECTOR)
         assertSearchParam("columnName", "tsvector.val")
     }
 
     @Test
-    fun text_search_websearch() {
+    fun `text search websearch`() {
         filterBuilder!!.textSearch("columnName", "val", TextSearchType.WEBSEARCH)
         assertSearchParam("columnName", "websearch.val")
     }

@@ -4,7 +4,6 @@ plugins {
     kotlin("multiplatform") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     id("maven-publish")
-    id("com.google.devtools.ksp") version "1.6.10-1.0.4"
 }
 
 group = "io.supabase.postgrest"
@@ -45,12 +44,13 @@ kotlin {
                 implementation(project.dependencies.platform("org.jetbrains.kotlin:kotlin-bom"))
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+                implementation("io.ktor:ktor-client-logging:$ktorVersion")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("io.mockative:mockative:1.1.4")
+                implementation("io.ktor:ktor-client-mock:$ktorVersion")
             }
         }
         val jvmMain by getting {
@@ -60,9 +60,14 @@ kotlin {
         }
         val jvmTest by getting {
             dependencies {
+                dependsOn(commonMain)
+                implementation("io.mockk:mockk:1.12.3")
+                implementation(kotlin("test"))
+                // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params
+                implementation("org.junit.jupiter:junit-jupiter-params:5.6.0")
+
             }
 
-            kotlin.srcDir("build/generated/ksp/jvm/jvmTest/kotlin")
         }
 //        val jsMain by getting {
 //            dependencies {
@@ -79,26 +84,21 @@ kotlin {
             }
         }
         val iosTest by getting {
-            kotlin.srcDir("build/generated/ksp/ios/iosTest/kotlin")
+
         }
     }
 }
 
+tasks.named<Test>("jvmTest") {
+    useJUnitPlatform()
+//    testLogging {
+//        showExceptions = true
+//        showStandardStreams = true
+//        events = setOf(org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED, org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED)
+//        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+//    }
+}
+
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.14.2"
-}
-
-ksp {
-    arg("mockative.logging", "debug")
-}
-
-dependencies {
-    ksp("io.mockative:mockative-processor:1.1.4")
-//    add("kspMetadata","io.mockative:mockative-processor:1.1.4")
-//    add("kspJvmTest","io.mockative:mockative-processor:1.1.4")
-//    add("kspJvmMain","io.mockative:mockative-processor:1.1.4")
-//    add("kspIosArm64Test","io.mockative:mockative-processor:1.1.4")
-//    add("kspIosArm64Main","io.mockative:mockative-processor:1.1.4")
-//    add("kspIosX64Test","io.mockative:mockative-processor:1.1.4")
-//    add("kspIosX64Main","io.mockative:mockative-processor:1.1.4")
 }

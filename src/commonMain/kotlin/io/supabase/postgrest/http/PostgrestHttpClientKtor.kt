@@ -2,50 +2,77 @@ package io.supabase.postgrest.http
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.features.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
-import kotlinx.serialization.KSerializer
 
 class PostgrestHttpClient(val httpClient: HttpClient) {
 
-    suspend inline fun <reified T : KSerializer<T>> execute(
+    suspend inline fun <reified T> execute(
         uri: Url,
         method: HttpMethod,
-        headers: Map<String, List<String>>,
-        body: Any?
+        headers: Map<String, List<String>> = emptyMap(),
+        body: Any? = null
     ): Result<PostgrestHttpResponse<T>> {
-        val response = httpClient.use { httpClient ->
-            httpClient.request<HttpResponse>(uri) {
-                this.method = method
-                if (body != null) {
-                    this.body = body
-                }
-                this.headers.build()
-                headers.forEach {
-                    this.headers.appendAll(it.key, it.value)
+        val result = runCatching {
+            httpClient.use { httpClient ->
+                httpClient.request<HttpResponse>(uri) {
+                    this.method = method
+                    if (body != null) {
+                        this.body = body
+                    }
+
+                    buildHeaders {
+                        headers.forEach {
+                            appendAll(it.key, it.value)
+                        }
+                    }
                 }
             }
         }
 
-        val responseObj = responseHandler<T>(response)
+        if (result.isFailure) {
+            return when (val ex = result.exceptionOrNull()) {
+                is RedirectResponseException -> {
+                    Result.failure(PostgrestHttpException(ex.response.status, ex.response.readText()))
+                }
 
-        return Result.success(responseObj)
+                is Exception -> {
+                    Result.failure(
+                        PostgrestHttpException(
+                            HttpStatusCode(418, "I'm a teapot"),
+                            ex.stackTraceToString()
+                        )
+                    )
+                }
+
+                else -> Result.failure(
+                    PostgrestHttpException(
+                        HttpStatusCode(418, "I'm a teapot"),
+                        "Null Exception"
+                    )
+                )
+            }
+        }
+
+        return Result.success(responseHandler(result.getOrThrow()))
     }
 
 }
 
-suspend inline fun <reified T : KSerializer<T>> responseHandler(response: HttpResponse): PostgrestHttpResponse<T> {
-    val statusSuccessful =
-        response.status.isSuccess() || response.status == HttpStatusCode.TemporaryRedirect || response.status == HttpStatusCode.PermanentRedirect
-
-    if (!statusSuccessful) {
-        val entityAsString = response.receive<String>()
-
-        throw PostgrestHttpException(response.status, entityAsString)
-    }
+suspend inline fun <reified T> responseHandler(response: HttpResponse): PostgrestHttpResponse<T> {
+//    val statusSuccessful =
+//        response.status.isSuccess() || response.status == HttpStatusCode.TemporaryRedirect || response.status == HttpStatusCode.PermanentRedirect
+//
+//    if (!statusSuccessful) {
+//        val entityAsString = response.receive<String>()
+//
+//        throw PostgrestHttpException(response.status, entityAsString)
+//    }
 
     val count = extractCount(response.headers.toMap(), response.request.headers.toMap())
     val obj = response.receive<T>()

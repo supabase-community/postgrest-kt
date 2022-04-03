@@ -14,8 +14,11 @@ open class PostgrestBuilder<T : Any> {
         jsonConverter = builder.jsonConverter
         url = builder.url
         schema = builder.schema
-        mSearchParams = builder.searchParams
+//        mSearchParams = builder.searchParams
         mBody = builder.body
+        builder.headers.forEach {
+            setHeader(it.key, it.value)
+        }
     }
 
     constructor(old: PostgrestBuilder<T>) {
@@ -25,6 +28,7 @@ open class PostgrestBuilder<T : Any> {
         schema = old.schema
         mSearchParams = old.searchParams.toMutableMap()
         mBody = old.body
+        mHeaders = old.mHeaders
     }
 
     val jsonConverter: Json
@@ -38,8 +42,10 @@ open class PostgrestBuilder<T : Any> {
     private var mSearchParams: MutableMap<String, String> = mutableMapOf()
     val searchParams: Map<String, String>
         get() = mSearchParams.toMap()
+
     private var mBody: Any? = null
-    val body: Any? = mBody
+    val body: Any?
+        get() = mBody
 
     private var mHeaders: MutableMap<String, List<String>> = mutableMapOf()
     val headers: Map<String, List<String>>
@@ -66,9 +72,8 @@ open class PostgrestBuilder<T : Any> {
             ignoreUnknownKeys = true
         }
         var url: Url? = null
-        var method: HttpMethod? = null
         var schema: String? = null
-        var searchParams: MutableMap<String, String> = mutableMapOf()
+        var headers: MutableMap<String, String> = mutableMapOf()
         var body: T? = null
         open fun build() = PostgrestBuilder(this)
     }
