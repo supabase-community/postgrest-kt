@@ -10,5 +10,5 @@ import io.ktor.http.*
  * @property[status] HTTP status code
  * @property[data] Response body as [String] if available
  */
-class PostgrestHttpException(val status: HttpStatusCode, val data: String?) :
+class PostgrestHttpException(val status: HttpStatusCode, val data: String?, val exception: Exception?) :
     RuntimeException("Unexpected response status: $status")

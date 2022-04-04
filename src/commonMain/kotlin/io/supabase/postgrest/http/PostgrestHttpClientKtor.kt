@@ -9,6 +9,7 @@ import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
+import kotlin.coroutines.cancellation.CancellationException
 
 class PostgrestHttpClient(val httpClient: HttpClient) {
 
@@ -18,8 +19,8 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
         headers: Map<String, List<String>> = emptyMap(),
         body: Any? = null
     ): Result<PostgrestHttpResponse<T>> {
-        val result = runCatching {
-            httpClient.use { httpClient ->
+        try {
+            val callResult = httpClient.use { httpClient ->
                 httpClient.request<HttpResponse>(uri) {
                     this.method = method
                     if (body != null) {
@@ -33,46 +34,45 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
                     }
                 }
             }
-        }
+            val resultProcessed = responseHandler<T>(callResult)
 
-        if (result.isFailure) {
-            return when (val ex = result.exceptionOrNull()) {
+            return Result.success(resultProcessed)
+        } catch (ex: Exception) {
+            return when (ex) {
                 is RedirectResponseException -> {
-                    Result.failure(PostgrestHttpException(ex.response.status, ex.response.readText()))
+                    Result.failure(
+                        PostgrestHttpException(ex.response.status, ex.response.readText(), ex)
+                    )
                 }
 
-                is Exception -> {
+                is PostgrestHttpException -> {
+                    Result.failure(ex)
+                }
+
+                else -> {
                     Result.failure(
                         PostgrestHttpException(
                             HttpStatusCode(418, "I'm a teapot"),
-                            ex.stackTraceToString()
+                            ex.message,
+                            ex
                         )
                     )
                 }
-
-                else -> Result.failure(
-                    PostgrestHttpException(
-                        HttpStatusCode(418, "I'm a teapot"),
-                        "Null Exception"
-                    )
-                )
             }
         }
-
-        return Result.success(responseHandler(result.getOrThrow()))
     }
 
 }
 
+@Throws(PostgrestHttpException::class, CancellationException::class)
 suspend inline fun <reified T> responseHandler(response: HttpResponse): PostgrestHttpResponse<T> {
-//    val statusSuccessful =
-//        response.status.isSuccess() || response.status == HttpStatusCode.TemporaryRedirect || response.status == HttpStatusCode.PermanentRedirect
-//
-//    if (!statusSuccessful) {
-//        val entityAsString = response.receive<String>()
-//
-//        throw PostgrestHttpException(response.status, entityAsString)
-//    }
+    val statusSuccessful = response.status.isSuccess()
+
+    if (!statusSuccessful) {
+        val entityAsString = response.receive<String>()
+
+        throw PostgrestHttpException(response.status, entityAsString, null)
+    }
 
     val count = extractCount(response.headers.toMap(), response.request.headers.toMap())
     val obj = response.receive<T>()
