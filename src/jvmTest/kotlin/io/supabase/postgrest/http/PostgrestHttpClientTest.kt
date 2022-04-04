@@ -7,6 +7,7 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.util.*
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -65,7 +66,11 @@ class PostgrestHttpClientTest {
 
     @Test
     fun `should set http headers`() = runTest {
-        val headers = mapOf("Authorization" to listOf("foobar"), "Content-Type" to listOf("application/json"))
+
+        val headers = buildHeaders {
+            append("Authorization", "foobar")
+            append("Content-Type", "application/json")
+        }
 
         mockEngineHandler = {
             respond(content = "", headers = headersOf())
@@ -79,7 +84,7 @@ class PostgrestHttpClientTest {
         val request = mockEngine.requestHistory.firstOrNull()
         val requestHeaders = request?.headers?.toMap()
 
-        assertEquals(headers.size, requestHeaders!!.size)
+        assertEquals(headers.toMap().size, requestHeaders!!.size)
 
         requestHeaders.forEach { (name, value) ->
             assertEquals(value, requestHeaders[name])

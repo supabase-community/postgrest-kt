@@ -1,26 +1,17 @@
 package io.supabase.postgrest.builder
 
 import io.ktor.http.*
-import io.supabase.postgrest.builder.PostgrestFilterBuilder.Companion.postrestFilter
+import io.supabase.postgrest.http.PostgrestHttpClient
 
 class PostgrestQueryBuilder<T : Any> : PostgrestBuilder<T> {
 
-    internal constructor(builder: Builder<T>) : super(builder)
+    constructor(url: Url, schema: String? = null, headers: Headers, httpClient: PostgrestHttpClient)
+            : super(url, schema, headers, httpClient)
 
     internal constructor(builder: PostgrestBuilder<T>) : super(builder)
 
     companion object {
         const val HEADER_PREFER = "Prefer"
-
-        fun <T : Any> postrestQuery(block: PostgrestBuilder.Builder<T>.() -> Unit) = PostgrestQueryBuilder.Builder<T>()
-            .apply(block).build()
-
-        fun <T : Any> postrestQuery(old: PostgrestBuilder<T>): PostgrestQueryBuilder<T> = PostgrestQueryBuilder(old)
-
-    }
-
-    internal class Builder<T : Any> : PostgrestBuilder.Builder<T>() {
-        override fun build() = PostgrestQueryBuilder(this)
     }
 
     /**
@@ -49,7 +40,7 @@ class PostgrestQueryBuilder<T : Any> : PostgrestBuilder<T> {
             setHeader(HEADER_PREFER, "count=${count.identifier}")
         }
 
-        return postrestFilter(this)
+        return PostgrestFilterBuilder(this)
     }
 
     /**

@@ -1,24 +1,15 @@
 package io.supabase.postgrest.builder
 
 import io.ktor.http.*
+import io.supabase.postgrest.http.PostgrestHttpClient
 import kotlin.reflect.KProperty1
 
 open class PostgrestTransformBuilder<T : Any> : PostgrestBuilder<T> {
 
-    internal constructor(builder: Builder<T>) : super(builder)
+    constructor(url: Url, schema: String? = null, headers: Headers, httpClient: PostgrestHttpClient)
+            : super(url, schema, headers, httpClient)
 
     internal constructor(old: PostgrestBuilder<T>) : super(old)
-
-    internal open class Builder<T : Any> : PostgrestBuilder.Builder<T>() {
-        override fun build() = PostgrestTransformBuilder(this)
-    }
-
-    companion object {
-        fun <T : Any> postrestTransform(block: PostgrestBuilder.Builder<T>.() -> Unit) =
-            Builder<T>().apply(block).build()
-
-        fun <T : Any> postrestTransform(old: PostgrestBuilder<T>) = PostgrestTransformBuilder(old)
-    }
 
 
     /**

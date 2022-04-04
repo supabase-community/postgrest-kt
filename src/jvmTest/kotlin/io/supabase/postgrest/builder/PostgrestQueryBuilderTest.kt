@@ -2,7 +2,7 @@ package io.supabase.postgrest.builder
 
 
 import io.ktor.http.*
-import io.supabase.postgrest.builder.PostgrestQueryBuilder.Companion.postrestQuery
+import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -13,19 +13,18 @@ internal class PostgrestQueryBuilderTest {
 
     private var queryBuilder: PostgrestQueryBuilder<Any>? = null
     private var testSchema = ""
-    private var testHeaders = mutableMapOf<String, String>()
+    private var testHeaders = headersOf()
 
     @BeforeEach
     fun beforeEach() {
-        testHeaders = mutableMapOf()
+        testHeaders = headersOf()
         testSchema = ""
-        queryBuilder = postrestQuery {
-            url = Url(URI("123"))
-            schema = testSchema
-            headers = testHeaders
-        }
-
-//        queryBuilder = PostgrestQueryBuilder(URI("123"), mockk(), mockk(), emptyMap(), null)
+        queryBuilder = PostgrestQueryBuilder(
+            url = Url(URI("123")),
+            schema = testSchema,
+            headers = testHeaders,
+            httpClient = mockk()
+        )
     }
 
     @Nested
@@ -167,20 +166,20 @@ internal class PostgrestQueryBuilderTest {
     }
 
     private fun assertHeader(name: String, value: String) {
-        assertEquals(queryBuilder!!.headers[name]?.first(), value)
+        assertEquals(value, queryBuilder!!.headers[name])
     }
 
     private fun assertMethod(method: HttpMethod) {
-        assertEquals(queryBuilder!!.method, method)
+        assertEquals(method, queryBuilder!!.method)
     }
 
     private fun assertBody(body: Any?) {
-        assertEquals(queryBuilder!!.body, body)
+        assertEquals(body, queryBuilder!!.body)
     }
 
     private fun assertSearchParam(name: String, value: String) {
         val searchParams = queryBuilder!!.searchParams
-        assertEquals(searchParams[name], value)
+        assertEquals(value, searchParams[name])
     }
 
 }

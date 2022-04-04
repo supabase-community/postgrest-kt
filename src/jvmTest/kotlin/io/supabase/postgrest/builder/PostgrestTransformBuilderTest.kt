@@ -1,6 +1,7 @@
 package io.supabase.postgrest.builder
 
 import io.ktor.http.*
+import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -12,19 +13,19 @@ internal class PostgrestTransformBuilderTest {
     private var transformBuilder: PostgrestTransformBuilder<Any>? = null
 
     private var testSchema = ""
-    private var testHeaders = mutableMapOf<String, String>()
+    private var testHeaders = headersOf()
 
     @BeforeEach
     fun beforeEach() {
-        testHeaders = mutableMapOf()
+        testHeaders = headersOf()
         testSchema = ""
-        transformBuilder = PostgrestTransformBuilder.postrestTransform {
-            url = Url(URI(""))
-            schema = testSchema
-            headers = testHeaders
-        }
 
-//        transformBuilder = PostgrestTransformBuilder(PostgrestBuilder(URI(""), mockk(), mockk(), emptyMap(), null))
+        transformBuilder = PostgrestTransformBuilder(
+            url = Url(URI("")),
+            schema = testSchema,
+            headers = testHeaders,
+            httpClient = mockk()
+        )
     }
 
     @Test
@@ -152,7 +153,7 @@ internal class PostgrestTransformBuilderTest {
     }
 
     private fun assertHeader(name: String, value: String) {
-        assertEquals(transformBuilder!!.headers[name]?.first(), value)
+        assertEquals(value, transformBuilder!!.headers[name])
     }
 
 }

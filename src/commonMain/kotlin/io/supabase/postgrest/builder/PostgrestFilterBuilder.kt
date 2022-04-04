@@ -1,23 +1,15 @@
 package io.supabase.postgrest.builder
 
+import io.ktor.http.*
+import io.supabase.postgrest.http.PostgrestHttpClient
 import kotlin.reflect.KProperty1
 
 open class PostgrestFilterBuilder<T : Any> : PostgrestTransformBuilder<T> {
 
-    internal constructor(builder: Builder<T>) : super(builder)
+    constructor(url: Url, schema: String? = null, headers: Headers, httpClient: PostgrestHttpClient)
+            : super(url, schema, headers, httpClient)
 
     internal constructor(builder: PostgrestBuilder<T>) : super(builder)
-
-    internal class Builder<T : Any> : PostgrestTransformBuilder.Builder<T>() {
-        override fun build() = PostgrestFilterBuilder(this)
-    }
-
-    companion object {
-        fun <T : Any> postrestFilter(block: PostgrestBuilder.Builder<T>.() -> Unit) = Builder<T>()
-            .apply(block).build()
-
-        fun <T : Any> postrestFilter(old: PostgrestBuilder<T>): PostgrestFilterBuilder<T> = PostgrestFilterBuilder(old)
-    }
 
     /**
      * Finds all rows which doesn't satisfy the filter.

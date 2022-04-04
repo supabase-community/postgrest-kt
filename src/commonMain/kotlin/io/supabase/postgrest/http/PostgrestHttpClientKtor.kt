@@ -16,7 +16,7 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
     suspend inline fun <reified T> execute(
         uri: Url,
         method: HttpMethod,
-        headers: Map<String, List<String>> = emptyMap(),
+        headers: Headers = headersOf(),
         body: Any? = null
     ): Result<PostgrestHttpResponse<T>> {
         try {
@@ -28,9 +28,7 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
                     }
 
                     buildHeaders {
-                        headers.forEach {
-                            appendAll(it.key, it.value)
-                        }
+                        appendAll(headers)
                     }
                 }
             }
