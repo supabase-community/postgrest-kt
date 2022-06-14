@@ -5,11 +5,13 @@ import assertk.assertions.isEqualTo
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.net.URI
 import kotlin.reflect.KProperty1
 
 internal class PostgrestFilterBuilderTest {
 
-    private val postgrestBuilderMock = mockk<PostgrestBuilder<Any>>()
+    private val postgrestBuilderMock = PostgrestBuilder<Any>(URI(""), mockk(), mockk(), emptyMap(), null)
+
     private var filterBuilder: PostgrestFilterBuilder<Any>? = null
 
     @BeforeEach
