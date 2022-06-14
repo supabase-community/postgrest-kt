@@ -31,7 +31,11 @@ open class PostgrestBuilder<T : Any> {
         this.jsonConverter = builder.jsonConverter
         this.schema = schema
 
-        builder.getSearchParams().forEach {
+        var params = builder.searchParams
+        if (params == null) {
+            params = mutableMapOf()
+        }
+        params.forEach {
             (name, value) -> setSearchParam(name, value)
         }
     }
