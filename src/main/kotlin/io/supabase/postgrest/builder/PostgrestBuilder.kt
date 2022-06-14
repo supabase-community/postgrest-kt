@@ -30,7 +30,10 @@ open class PostgrestBuilder<T : Any> {
         this.body = builder.body
         this.jsonConverter = builder.jsonConverter
         this.schema = schema
-        this.searchParams = builder.searchParams
+
+        builder.getSearchParams().forEach {
+            (name, value) -> setSearchParam(name, value)
+        }
     }
 
     constructor(url: URI, httpClient: PostgrestHttpClient, jsonConverter: PostgrestJsonConverter, headers: Map<String, String>, schema: String?) {
