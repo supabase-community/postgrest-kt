@@ -1,5 +1,6 @@
 package io.supabase.postgrest.builder
 
+import java.util.Locale
 import kotlin.reflect.KProperty1
 
 class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestTransformBuilder<T>(builder) {
@@ -439,7 +440,7 @@ class PostgrestFilterBuilder<T : Any>(builder: PostgrestBuilder<T>) : PostgrestT
     }
 
     private val KProperty1<T, Any>.columnName : String get() {
-        return this.name.toLowerCase()
+        return this.name.lowercase(Locale.getDefault())
     }
 }
 
