@@ -14,7 +14,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 class PostgrestJsonConverterJackson : PostgrestJsonConverter {
 
     private val objectMapper = ObjectMapper()
-            .registerModule(KotlinModule())
+            .registerModule(KotlinModule.Builder().build())
             .registerModule(JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
