@@ -58,6 +58,18 @@ postgresClient.from<Message>("messages")
     .select()
     .neq(Message::content, "abc")
     .execute()
+
+// select item_id AS itemId, age from messages...
+postgresClient.from<Message>("messages")
+    .select("itemId:item_id,age")
+    .neq(Message::content, "abc")
+    .execute()
+
+// https://postgrest.org/en/stable/api.html#embedding-top-level-filter
+postgresClient.from<Message>("messages")
+    .select("name,age,company(name, address, phone)")
+    .neq(Message::content, "abc")
+    .execute()
 ```
 
 #### rpc<T>

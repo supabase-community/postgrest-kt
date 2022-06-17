@@ -7,9 +7,9 @@ import io.supabase.postgrest.json.PostgrestJsonConverter
 import java.net.URI
 
 /**
- * Main client and entry point for using PostgREST client.
+ * Main client and entry point for using PostgresREST client.
  *
- * @param[uri] URL of the PostgREST endpoint.
+ * @param[uri] URL of the PostgresREST endpoint.
  * @param[headers] Custom headers.
  * @param[schema] Postgres schema to switch to.
  * @param[httpClient] Implementation of the [PostgrestHttpClient] interface.
