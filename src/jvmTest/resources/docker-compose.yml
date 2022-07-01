@@ -1,0 +1,27 @@
+version: '3'
+services:
+  server:
+    image: postgrest/postgrest:v7.0.1
+    expose:
+      - 3111
+    ports:
+      - "3111:3000"
+    links:
+      - db:db
+    environment:
+      PGRST_DB_URI: postgres://app_user@db:5432/app_db
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: app_user #In production this role should not be the same as the one used for the connection
+    depends_on:
+      - db
+  db:
+    image: postgres:12.5
+    ports:
+      - "5999:5432"
+    expose:
+      - 5999
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust

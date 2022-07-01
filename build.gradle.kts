@@ -18,7 +18,7 @@ kotlin {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
         }
-        withJava()
+//        withJava()
     }
 //    js(IR) {
 //        browser()
@@ -45,6 +45,8 @@ kotlin {
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
+
+                implementation("co.touchlab:kermit:1.1.3")
             }
         }
         val commonTest by getting {
@@ -64,8 +66,17 @@ kotlin {
                 dependsOn(commonMain)
                 implementation("io.mockk:mockk:1.12.3")
                 implementation(kotlin("test"))
-                // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params
                 implementation("org.junit.jupiter:junit-jupiter-params:5.6.0")
+
+                implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+                implementation("org.testcontainers:testcontainers:1.16.3")
+                implementation("org.testcontainers:junit-jupiter:1.16.3")
+                implementation("org.testcontainers:postgresql:1.16.3")
+                implementation("org.postgresql:postgresql:42.3.3")
+
+                implementation("org.slf4j:slf4j-api:1.7.36")
+                implementation("ch.qos.logback:logback-classic:1.2.11")
+
 
             }
 
