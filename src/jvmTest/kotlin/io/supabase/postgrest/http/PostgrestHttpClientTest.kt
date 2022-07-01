@@ -84,7 +84,8 @@ class PostgrestHttpClientTest {
         val request = mockEngine.requestHistory.firstOrNull()
         val requestHeaders = request?.headers?.toMap()
 
-        assertEquals(headers.toMap().size, requestHeaders!!.size)
+        //TODO CHANGE TEST to Accept Charset
+        assertEquals(headers.toMap().size, (requestHeaders!!.toMutableMap() - "Accept-Charset").size)
 
         requestHeaders.forEach { (name, value) ->
             assertEquals(value, requestHeaders[name])
