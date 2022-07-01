@@ -1,8 +1,8 @@
 val ktorVersion = "1.6.8"
 val mockkVersion = "1.12.3"
 plugins {
-    kotlin("multiplatform") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("multiplatform") version "1.6.20"
+    kotlin("plugin.serialization") version "1.6.20"
     id("maven-publish")
 }
 
