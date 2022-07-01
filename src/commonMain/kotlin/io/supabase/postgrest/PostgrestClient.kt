@@ -19,7 +19,7 @@ open class PostgrestClient(
      */
     fun <T : Any> from(table: String): PostgrestQueryBuilder<T> {
         val uri = URLBuilder(url).run {
-            path("/$table")
+            path(table)
             build()
         }
 

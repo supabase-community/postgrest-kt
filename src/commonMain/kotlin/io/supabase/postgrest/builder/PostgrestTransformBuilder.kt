@@ -100,8 +100,12 @@ open class PostgrestTransformBuilder<T : Any> : PostgrestBuilder<T> {
      * otherwise this will result in an error.
      */
     fun single(): PostgrestTransformBuilder<T> {
-        setHeader(HttpHeaders.Accept, "application/vnd.pgrst.object+json")
+        setHeader(getSingleHeader())
 
         return this
+    }
+
+    companion object {
+        fun getSingleHeader(): Pair<String, String> = HttpHeaders.Accept to "application/vnd.pgrst.object+json"
     }
 }

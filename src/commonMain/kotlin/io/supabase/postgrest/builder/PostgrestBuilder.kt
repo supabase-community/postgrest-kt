@@ -3,7 +3,7 @@ package io.supabase.postgrest.builder
 import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.supabase.postgrest.http.PostgrestHttpClient
-import kotlinx.serialization.KSerializer
+import io.supabase.postgrest.http.PostgrestHttpResponse
 
 open class PostgrestBuilder<T : Any> {
 
@@ -57,6 +57,13 @@ open class PostgrestBuilder<T : Any> {
         }
     }
 
+    internal fun setHeader(pair: Pair<String, String>) {
+        headers = buildHeaders {
+            appendAll(headers)
+            append(pair.first, pair.second)
+        }
+    }
+
     internal fun setMethod(method: HttpMethod) {
         mMethod = method
     }
@@ -67,32 +74,42 @@ open class PostgrestBuilder<T : Any> {
 
 }
 
-suspend inline fun <reified T : KSerializer<T>> PostgrestBuilder<T>.execute() {
+suspend inline fun <reified T> PostgrestBuilder<*>.executeCall(): Result<PostgrestHttpResponse<T>> {
     checkNotNull(method) { "Method cannot be null" }
     checkNotNull(url) { "Url cannot be null" }
 
-    val mHeaders = if (schema != null) {
-        buildHeaders {
-            appendAll(headers)
+    when (T::class) {
+        List::class -> {
+            val singleHeader = PostgrestTransformBuilder.getSingleHeader()
+            require(!headers.contains(singleHeader.first, singleHeader.second))
+        }
+    }
+
+    val mHeaders = buildHeaders {
+        appendAll(headers)
+        if (schema != null) {
             if (method in listOf(HttpMethod.Get, HttpMethod.Head)) {
                 append("Accept-Profile", schema)
             } else {
                 append(HttpHeaders.ContentType, schema)
             }
         }
-    } else {
-        headers
+
+        if (T::class == String::class || T::class == Unit::class) {
+            append(HttpHeaders.Accept, ContentType.Text.Plain.toString())
+        }
+
+        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }
 
-    val queryParameters = ParametersBuilder().run {
+    val queryParameters = ParametersBuilder(urlEncodingOption = UrlEncodingOption.NO_ENCODING).run {
         searchParams.entries.forEach {
-            //value.encodeURLPath()
             append(it.key, it.value)
         }
         build()
     }
 
-    httpClient.execute<T>(
+    return httpClient.execute(
         uri = url.copy(
             parameters = queryParameters
         ),
