@@ -1,13 +1,11 @@
-DROP
-PUBLICATION IF EXISTS supabase_realtime;
+DROP PUBLICATION IF EXISTS supabase_realtime;
 DROP SCHEMA IF EXISTS public CASCADE;
 DROP SCHEMA IF EXISTS personal CASCADE;
 
 CREATE SCHEMA public;
 
 -- Create the Replication publication
-CREATE
-PUBLICATION supabase_realtime FOR ALL TABLES;
+CREATE PUBLICATION supabase_realtime FOR ALL TABLES;
 
 -- Create a second schema
 CREATE SCHEMA personal;
@@ -19,12 +17,12 @@ CREATE TABLE public.users
     username    text primary key,
     data        jsonb       DEFAULT null,
     age_range   int4range   DEFAULT null,
-    status      user_status DEFAULT 'ONLINE':: public.user_status,
+    status      user_status DEFAULT 'ONLINE'::public.user_status,
     catchphrase tsvector    DEFAULT null
 );
-ALTER TABLE public.users REPLICA IDENTITY FULL; -- Send "previous data" to supabase
-COMMENT
-ON COLUMN public.users.data IS 'For unstructured data and prototyping.';
+ALTER TABLE public.users
+    REPLICA IDENTITY FULL; -- Send "previous data" to supabase
+COMMENT ON COLUMN public.users.data IS 'For unstructured data and prototyping.';
 
 -- CHANNELS
 CREATE TABLE public.channels
@@ -33,9 +31,9 @@ CREATE TABLE public.channels
     data jsonb DEFAULT null,
     slug text
 );
-ALTER TABLE public.users REPLICA IDENTITY FULL; -- Send "previous data" to supabase
-COMMENT
-ON COLUMN public.channels.data IS 'For unstructured data and prototyping.';
+ALTER TABLE public.users
+    REPLICA IDENTITY FULL; -- Send "previous data" to supabase
+COMMENT ON COLUMN public.channels.data IS 'For unstructured data and prototyping.';
 
 -- MESSAGES
 CREATE TABLE public.messages
@@ -46,59 +44,47 @@ CREATE TABLE public.messages
     username   text REFERENCES users      NOT NULL,
     channel_id bigint REFERENCES channels NOT NULL
 );
-ALTER TABLE public.messages REPLICA IDENTITY FULL; -- Send "previous data" to supabase
-COMMENT
-ON COLUMN public.messages.data IS 'For unstructured data and prototyping.';
+ALTER TABLE public.messages
+    REPLICA IDENTITY FULL; -- Send "previous data" to supabase
+COMMENT ON COLUMN public.messages.data IS 'For unstructured data and prototyping.';
 
 -- STORED FUNCTION
 CREATE FUNCTION public.get_status(name_param text)
-    RETURNS user_status AS $$
+    RETURNS user_status AS
+$$
 SELECT status
 from users
 WHERE username = name_param;
-$$
-LANGUAGE SQL IMMUTABLE;
+$$ LANGUAGE SQL IMMUTABLE;
 
 CREATE FUNCTION public.get_username_and_status(name_param text)
-    RETURNS TABLE (username text, status user_status) AS $$
+    RETURNS TABLE
+            (
+                username text,
+                status   user_status
+            )
+AS
+$$
 SELECT username, status
 from users
 WHERE username = name_param;
-$$
-LANGUAGE SQL IMMUTABLE;
+$$ LANGUAGE SQL IMMUTABLE;
 
 -- SECOND SCHEMA USERS
 CREATE TYPE personal.user_status AS ENUM ('ONLINE', 'OFFLINE');
 CREATE TABLE IF NOT EXISTS personal.users
 (
-    username
-    text
-    primary
-    key,
-    data
-    jsonb
-    DEFAULT
-    null,
-    age_range
-    int4range
-    DEFAULT
-    null,
-    status
-    user_status
-    DEFAULT
-    'ONLINE'
-    :
-    :
-    public
-    .
-    user_status
+    username  text primary key,
+    data      jsonb       DEFAULT null,
+    age_range int4range   DEFAULT null,
+    status    user_status DEFAULT 'ONLINE'::public.user_status
 );
 
 -- SECOND SCHEMA STORED FUNCTION
 CREATE FUNCTION personal.get_status(name_param text)
-    RETURNS user_status AS $$
+    RETURNS user_status AS
+$$
 SELECT status
 from users
 WHERE username = name_param;
-$$
-LANGUAGE SQL IMMUTABLE;
+$$ LANGUAGE SQL IMMUTABLE;
