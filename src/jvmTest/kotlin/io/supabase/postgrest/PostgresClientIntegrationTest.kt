@@ -2,13 +2,17 @@ package io.supabase.postgrest
 
 import io.ktor.client.engine.apache.*
 import io.ktor.http.*
+import io.supabase.postgrest.builder.Count
 import io.supabase.postgrest.builder.executeCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.ClassRule
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.io.File
@@ -100,23 +104,25 @@ open class PostgresClientIntegrationTest {
 
         @Test
         fun `basic insert`() = runTest {
-            val message = mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1)
-            val insertResult = postgrestClient.from<Any>("messages")
+            val message = Message(id = 100, message = "foo", username = "supabot", channel_id = 1)
+
+            val insertResult = postgrestClient.from<Message>("messages")
                 .insert(message)
                 .executeCall<String>()
 
+            assertEquals(HttpStatusCode.Created, insertResult.getOrThrow().status)
             assertTrue(insertResult.isSuccess)
 
-            val dataFromPostgres = postgrestClient.from<Any>("messages")
+            val dataFromPostgres = postgrestClient
+                .from<Any>("messages")
                 .select()
                 .eq("message", "foo")
                 .limit(1)
                 .single()
-                .executeCall<Map<String, Any>>()
+                .executeCall<Message>()
 
-            assertAll({
-                message.forEach { (key, value) -> assertEquals(value, dataFromPostgres.getOrThrow().body[key]) }
-            })
+            assertEquals(HttpStatusCode.OK, dataFromPostgres.getOrThrow().status)
+            assertEquals(message, dataFromPostgres.getOrThrow().body)
         }
 
 
@@ -125,77 +131,77 @@ open class PostgresClientIntegrationTest {
             val message = Message(
                 id = 3,
                 message = "foo",
+                username = "supabot",
                 channel_id = 1
             )
 
-            val updatedMessage = mapOf("id" to 3, "message" to "foo", "username" to "supabot", "channel_id" to 1)
-            val result1 = runCatching {
-                postgrestClient.from<Message>("messages")
-                    .insert(
-                        value = message,
-                        upsert = true
-                    )
-                    .executeCall<Any>()
-            }
+            val result1 = postgrestClient.from<Message>("messages")
+                .insert(
+                    value = message,
+                    upsert = true
+                )
+                .executeCall<Any>()
 
             assertTrue(result1.isSuccess)
             val postgrestClient2 =
                 PostgrestDefaultClient(uri = Url("http://127.0.0.1:3111"), clientEngine = Apache.create { })
 
-            val result2 = runCatching {
-                postgrestClient2.from<Unit>("messages")
-                    .select()
-                    .eq("id", 3)
-                    .limit(1)
-                    .single()
-                    .executeCall<Message>()
-            }
+            val result2 = postgrestClient2.from<Unit>("messages")
+                .select()
+                .eq("id", 3)
+                .limit(1)
+                .single()
+                .executeCall<Message>()
 
             assertTrue(result2.isSuccess)
 
-            val dataFromPostgres = result2.getOrThrow()
+            val dataFromPostgres = result2.getOrThrow().body
 
-            assertAll({
-                updatedMessage.forEach { (key, value) ->
-//                    assertEquals(value.toString(), dataFromPostgres.getOrThrow().body[key])
-                }
-
-            })
+            assertTrue { dataFromPostgres.id == message.id }
+            assertTrue { dataFromPostgres.message == message.message }
+            assertTrue { dataFromPostgres.username == message.username }
+            assertTrue { dataFromPostgres.channel_id == message.channel_id }
         }
-//
+
+        @Test
+        fun `bulk insert`() = runTest {
+            val message = MessageNoId(
+                message = "foo",
+                username = "supabot",
+                channelId = 1
+            )
+
+            postgrestClient.from<MessageNoId>("messages")
+                .insert(
+                    values = listOf(
+                        message,
+                        message
+                    )
+                )
+                .executeCall<Any>()
+
+            val response = postgrestClient.from<Any>("messages")
+                .select(count = Count.EXACT)
+                .executeCall<List<Message>>()
+
+            assertEquals(response.getOrThrow().body.count(), 4)
+        }
+
 //        @Test
-//        fun `bulk insert`() {
-//            postgrestClient.from<Any>("messages")
-//                .insert(
-//                    values = listOf(
-//                        mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1),
-//                        mapOf("message" to "foo", "username" to "supabot", "channel_id" to 1),
-//                    )
-//                )
-//                .execute()
-//
-//            val response = postgrestClient.from<Any>("messages")
-//                .select(count = Count.EXACT)
-//                .execute()
-//
-//            assertThat(response.count).isEqualTo(4)
-//        }
-//
-//        @Test
-//        fun `basic update`() {
+//        fun `basic update`() = runTest{
 //            val updateValues = mapOf("data" to mapOf("foo" to 1))
 //
 //            postgrestClient.from<Any>("messages")
 //                .update(updateValues)
 //                .eq("message", "Perfection is attained.")
-//                .execute()
+//                .executeCall<Any>()
 //
 //            val updatedEntry = postgrestClient.from<Any>("messages")
 //                .select()
 //                .eq("message", "Perfection is attained.")
 //                .limit(1)
 //                .single()
-//                .executeAndGetSingle<Map<String, Any>>()
+//                .executeCall<Map<String, Any>>()
 //
 //            assertThat(updatedEntry["data"]).isEqualTo(updateValues["data"])
 //        }
