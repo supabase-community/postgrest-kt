@@ -33,15 +33,17 @@ class PostgrestDefaultClient(
     url = uri,
     headers = headers,
     schema = schema,
-    httpClient = PostgrestHttpClient(
-        HttpClient(clientEngine) {
-            install(Logging) {
+    httpClient = {
+        PostgrestHttpClient(
+            HttpClient(clientEngine) {
+                install(Logging) {
 
-            }
+                }
 
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(json)
+                install(JsonFeature) {
+                    serializer = KotlinxSerializer(json)
+                }
             }
-        }
-    )
+        )
+    }
 )

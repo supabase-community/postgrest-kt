@@ -7,7 +7,7 @@ import io.supabase.postgrest.http.PostgrestHttpClient
 
 open class PostgrestClient(
     private val url: Url,
-    private val httpClient: PostgrestHttpClient,
+    private val httpClient: () -> PostgrestHttpClient,
     private val headers: Headers,
     private val schema: String? = null
 ) {
@@ -25,7 +25,7 @@ open class PostgrestClient(
 
         return PostgrestQueryBuilder(
             url = uri,
-            httpClient = httpClient,
+            httpClient = httpClient(),
             headers = headers,
             schema = schema
         )
@@ -45,7 +45,7 @@ open class PostgrestClient(
 
         return PostgrestQueryBuilder<T>(
             url = uri,
-            httpClient = httpClient,
+            httpClient = httpClient(),
             headers = headers,
             schema = schema
         ).rpc(params)
