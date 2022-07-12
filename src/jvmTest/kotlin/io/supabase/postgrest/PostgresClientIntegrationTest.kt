@@ -1,6 +1,5 @@
 package io.supabase.postgrest
 
-import io.ktor.client.engine.apache.*
 import io.ktor.http.*
 import io.supabase.postgrest.builder.Count
 import io.supabase.postgrest.builder.executeCall
@@ -55,7 +54,7 @@ open class PostgresClientIntegrationTest {
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
     private val postgrestClient =
-        PostgrestDefaultClient(uri = Url("http://127.0.0.1:3111"), clientEngine = Apache.create { })
+        PostgrestDefaultClient(uri = Url("http://127.0.0.1:3111"), headers = headersOf())
     private val tableUsers = "users"
 
     @BeforeTest
@@ -143,10 +142,8 @@ open class PostgresClientIntegrationTest {
                 .executeCall<Any>()
 
             assertTrue(result1.isSuccess)
-            val postgrestClient2 =
-                PostgrestDefaultClient(uri = Url("http://127.0.0.1:3111"), clientEngine = Apache.create { })
 
-            val result2 = postgrestClient2.from<Unit>("messages")
+            val result2 = postgrestClient.from<Unit>("messages")
                 .select()
                 .eq("id", 3)
                 .limit(1)
