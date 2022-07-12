@@ -1,24 +1,12 @@
 # Kotlin Client for PostgREST
 
-Kotlin JVM client for [PostgREST](https://postgrest.org/)
+Kotlin Multiplatform client for [PostgREST](https://postgrest.org/)
 
 ![Java CI with Gradle](https://img.shields.io/github/workflow/status/supabase/postgrest-kt/Java%20CI%20with%20Gradle?label=BUILD&style=for-the-badge)
 ![Gradle Package](https://img.shields.io/github/workflow/status/supabase/postgrest-kt/Gradle%20Package?label=PUBLISH&style=for-the-badge)
 ![Bintray](https://img.shields.io/bintray/v/supabase/supabase/postgrest-kt?style=for-the-badge)
 
 ## Installation
-
-Maven
-
-```xml
-<dependency>
-    <groupId>io.supabase</groupId>
-    <artifactId>postgrest-kt</artifactId>
-    <version>{version}</version>
-    <type>pom</type>
-</dependency>
-```
-
 Gradle
 
 ```
@@ -30,9 +18,16 @@ implementation 'io.supabase:postgrest-kt:{version}'
 ### Initializing the client
 
 ```kotlin
-val postgrestClient =  PostgrestDefaultClient(
-    uri = URI("http://localhost:3111"),
-    headers = mapOf("Authorization" to "foobar")
+val postgrestClient = PostgrestDefaultClient(
+    uri = Url("http://localhost:3111"),
+    headersMap = mapOf("Authorization" to "foobar")
+)
+```
+
+```kotlin
+val postgrestClient = PostgrestDefaultClient(
+    uri = Url("http://localhost:3111"),
+    headers = headersOf()
 )
 ```
 
@@ -191,19 +186,4 @@ val response = postgresClient.from<Any>("messages")
     .delete()
     .eq("id", 123L)
     .execute()
-```
-
-## HTTP / (De)-Serialization
-
-The Apache Http-Client (5.x) is used for executing HTTP calls, Jackson is used to convert responses to DTOs.
-
-If you want to change that, you need to implement the `PostgrestHttpClient` and the `PostgrestJsonConverter` interface.
-
-See [PostgrestHttpClientApache](src/main/kotlin/io/supabase/postgrest/http/PostgrestHttpClientApache.kt) and [PostgrestsonConverterJackson](src/main/kotlin/io/supabase/postgrest/json/PostgrestJsonConverterJackson.kt).
-
-```kotlin
-val postgrestClient = PostgrestClient(
-    httpClient = customHttpClient(),
-    jsonConverter = customConverter()
-)
 ```
