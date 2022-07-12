@@ -8,7 +8,8 @@ data class Message(
     val id: Int,
     val message: String,
     val username: String = "",
-    val channel_id: Int
+    val channel_id: Int,
+    val data: Map<String, Int>? = null
 )
 
 @Serializable
@@ -18,3 +19,9 @@ data class MessageNoId(
     @SerialName("channel_id")
     val channelId: Int
 )
+
+@Serializable
+data class MessageData(
+    val data: Map<String, Int>
+)
+

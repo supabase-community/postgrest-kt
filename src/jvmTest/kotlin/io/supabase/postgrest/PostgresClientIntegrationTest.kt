@@ -187,38 +187,40 @@ open class PostgresClientIntegrationTest {
             assertEquals(response.getOrThrow().body.count(), 4)
         }
 
-//        @Test
-//        fun `basic update`() = runTest{
-//            val updateValues = mapOf("data" to mapOf("foo" to 1))
-//
-//            postgrestClient.from<Any>("messages")
-//                .update(updateValues)
-//                .eq("message", "Perfection is attained.")
-//                .executeCall<Any>()
-//
-//            val updatedEntry = postgrestClient.from<Any>("messages")
-//                .select()
-//                .eq("message", "Perfection is attained.")
-//                .limit(1)
-//                .single()
-//                .executeCall<Map<String, Any>>()
-//
-//            assertThat(updatedEntry["data"]).isEqualTo(updateValues["data"])
-//        }
-//
-//        @Test
-//        fun `basic delete`() {
-//            postgrestClient.from<Any>("messages")
-//                .delete()
-//                .eq("message", "Perfection is attained.")
-//                .execute()
-//
-//            val response = postgrestClient.from<Any>("messages")
-//                .select(count = Count.EXACT)
-//                .execute()
-//
-//            assertThat(response.count).isEqualTo(1)
-//        }
+        @Test
+        fun `basic update`() = runTest {
+            val messageUpdate = MessageData(
+                data = mapOf("foo" to 1)
+            )
+
+            postgrestClient.from<MessageData>("messages")
+                .update(messageUpdate)
+                .eq("message", "Perfection is attained.")
+                .executeCall<Any>()
+
+            val updatedEntry = postgrestClient.from<Any>("messages")
+                .select()
+                .eq("message", "Perfection is attained.")
+                .limit(1)
+                .single()
+                .executeCall<Message>()
+
+            assertEquals(messageUpdate.data, updatedEntry.getOrThrow().body.data)
+        }
+
+        @Test
+        fun `basic delete`() = runTest {
+            postgrestClient.from<Any>("messages")
+                .delete()
+                .eq("message", "Perfection is attained.")
+                .executeCall<Any>()
+
+            val response = postgrestClient.from<Any>("messages")
+                .select(count = Count.EXACT)
+                .executeCall<Any>()
+
+            assertEquals(1, response.getOrThrow().count)
+        }
     }
 
     @kotlinx.serialization.Serializable
