@@ -3,12 +3,12 @@ package io.supabase.postgrest.http
 
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -50,9 +50,12 @@ class PostgrestHttpClientTest {
         httpClient = HttpClient(mockEngine) {
             expectSuccess = false
             followRedirects = false
-            install(Logging)
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(
+            install(Logging) {
+
+            }
+
+            install(ContentNegotiation) {
+                json(
                     kotlinx.serialization.json.Json {
                         ignoreUnknownKeys = true
                     }

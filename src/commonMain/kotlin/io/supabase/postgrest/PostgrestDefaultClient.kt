@@ -1,10 +1,10 @@
 package io.supabase.postgrest
 
 import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.logging.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.supabase.postgrest.http.PostgrestHttpClient
 import kotlinx.serialization.json.Json
 
@@ -26,8 +26,8 @@ class PostgrestDefaultClient(
 
                 }
 
-                install(JsonFeature) {
-                    serializer = KotlinxSerializer(json)
+                install(ContentNegotiation) {
+                    json(json)
                 }
             }
         )

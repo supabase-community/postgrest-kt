@@ -3,7 +3,7 @@ package io.supabase.postgrest.http
 import co.touchlab.kermit.Logger
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -21,10 +21,10 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
     ): Result<PostgrestHttpResponse<T>> {
         try {
             val callResult = httpClient.use { httpClient ->
-                httpClient.request<HttpResponse>(uri) {
+                httpClient.request(uri) {
                     this.method = method
                     if (body != null) {
-                        this.body = body
+                        setBody(body)
                     }
 
                     headers {
@@ -40,13 +40,13 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
             return when (ex) {
                 is ClientRequestException -> {
                     Result.failure(
-                        PostgrestHttpException(ex.response.status, ex.response.readText(), ex)
+                        PostgrestHttpException(ex.response.status, ex.response.bodyAsText(), ex)
                     )
                 }
 
                 is ResponseException -> {
                     Result.failure(
-                        PostgrestHttpException(ex.response.status, ex.response.readText(), ex)
+                        PostgrestHttpException(ex.response.status, ex.response.bodyAsText(), ex)
                     )
                 }
 
@@ -72,7 +72,7 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
         val statusSuccessful = response.status.isSuccess()
 
         if (!statusSuccessful) {
-            val entityAsString = response.receive<String>()
+            val entityAsString = response.body<String>()
 
             throw PostgrestHttpException(response.status, entityAsString, null)
         }
@@ -80,9 +80,9 @@ class PostgrestHttpClient(val httpClient: HttpClient) {
         val count = extractCount(response.headers.toMap(), response.request.headers.toMap())
 
         val obj = if (T::class == String::class) {
-            response.readText()
+            response.bodyAsText()
         } else {
-            response.receive<T>()
+            response.body<T>()
         } as T
 
         return PostgrestHttpResponse(

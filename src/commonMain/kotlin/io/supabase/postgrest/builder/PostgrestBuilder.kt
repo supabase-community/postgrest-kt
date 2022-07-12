@@ -102,17 +102,14 @@ suspend inline fun <reified T> PostgrestBuilder<*>.executeCall(): Result<Postgre
         append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }
 
-    val queryParameters = ParametersBuilder().run {
-        searchParams.entries.forEach {
-            append(it.key, it.value)
-        }
-        build()
-    }
+   val mUrl = URLBuilder(url).apply {
+       searchParams.entries.forEach {
+           parameters.append(it.key, it.value)
+       }
+   }
 
     return httpClient.execute(
-        uri = url.copy(
-            parameters = queryParameters
-        ),
+        uri = mUrl.build(),
         method = method!!,
         headers = mHeaders,
         body = body

@@ -1,8 +1,8 @@
-val ktorVersion = "1.6.8"
+val ktorVersion = "2.0.3"
 val mockkVersion = "1.12.3"
 plugins {
-    kotlin("multiplatform") version "1.6.20"
-    kotlin("plugin.serialization") version "1.6.20"
+    kotlin("multiplatform") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
     id("maven-publish")
 }
 
@@ -45,6 +45,8 @@ kotlin {
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-client-logging:$ktorVersion")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
                 implementation("co.touchlab:kermit:1.1.3")
             }
