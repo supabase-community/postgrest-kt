@@ -100,7 +100,7 @@ class PostgrestQueryBuilder<T : Any> : PostgrestBuilder<T> {
      * @param[returning] By default the updated record is returned. Set this to 'minimal' if you don't need this value.
      */
     fun update(
-        value: Any,
+        value: T,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null
     ): PostgrestFilterBuilder<T> {
