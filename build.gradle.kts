@@ -20,9 +20,10 @@ kotlin {
         }
 //        withJava()
     }
-//    js(IR) {
-//        browser()
-//    }
+    js(IR) {
+        browser()
+        nodejs()
+    }
     val iosTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -> Unit) -> org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget =
         when {
             System.getenv("SDK_NAME")?.startsWith("iphoneos") == true -> ::iosArm64
@@ -83,15 +84,15 @@ kotlin {
             }
 
         }
-//        val jsMain by getting {
-//            dependencies {
-//                implementation("io.ktor:ktor-client-js:$ktorVersion")
-//            }
-//        }
-//        val jsTest by getting {
-//            dependencies {
-//            }
-//        }
+        val jsMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-js:$ktorVersion")
+            }
+        }
+        val jsTest by getting {
+            dependencies {
+            }
+        }
         val iosMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-ios:$ktorVersion")
