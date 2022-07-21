@@ -74,7 +74,7 @@ open class PostgrestBuilder<T : Any> {
 
 }
 
-suspend inline fun <reified T> PostgrestBuilder<*>.executeCall(): Result<PostgrestHttpResponse<T>> {
+suspend inline fun <reified T> PostgrestBuilder<*>.executeCall(serializeNull: Boolean = true): Result<PostgrestHttpResponse<T>> {
     checkNotNull(method) { "Method cannot be null" }
     checkNotNull(url) { "Url cannot be null" }
 
@@ -112,6 +112,7 @@ suspend inline fun <reified T> PostgrestBuilder<*>.executeCall(): Result<Postgre
         uri = mUrl.build(),
         method = method!!,
         headers = mHeaders,
-        body = body
+        body = body,
+        serializeNull = serializeNull
     )
 }

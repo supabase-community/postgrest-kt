@@ -6,31 +6,35 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.supabase.postgrest.http.PostgrestHttpClient
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
+@OptIn(ExperimentalSerializationApi::class)
 class PostgrestDefaultClient(
     uri: Url,
     headers: Headers = headersOf(),
     schema: String? = null,
-    json: Json = Json {
-        ignoreUnknownKeys = true
-    }
 ) : PostgrestClient(
     url = uri,
     headers = headers,
     schema = schema,
     httpClient = {
-        PostgrestHttpClient(
+        PostgrestHttpClient {
             HttpClient {
                 install(Logging) {
 
                 }
 
                 install(ContentNegotiation) {
-                    json(json)
+                    json(
+                        Json {
+                            ignoreUnknownKeys = true
+                            explicitNulls = it
+                        }
+                    )
                 }
             }
-        )
+        }
     }
 ) {
 
@@ -38,9 +42,6 @@ class PostgrestDefaultClient(
         uri: Url,
         headersMap: Map<String, String> = mapOf(),
         schema: String? = null,
-        json: Json = Json {
-            ignoreUnknownKeys = true
-        }
     ) : this(
         uri,
         Headers.build {
@@ -48,8 +49,7 @@ class PostgrestDefaultClient(
                 append(it.key, it.value)
             }
         },
-        schema,
-        json
+        schema
     )
 
 }

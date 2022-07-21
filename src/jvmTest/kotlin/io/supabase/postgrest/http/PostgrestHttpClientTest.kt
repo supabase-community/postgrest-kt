@@ -63,7 +63,7 @@ class PostgrestHttpClientTest {
             }
         }
 
-        client = PostgrestHttpClient(httpClient)
+        client = PostgrestHttpClient { httpClient }
     }
 
 

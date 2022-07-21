@@ -11,16 +11,17 @@ import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlin.coroutines.cancellation.CancellationException
 
-class PostgrestHttpClient(val httpClient: HttpClient) {
+class PostgrestHttpClient(val httpClient: (serializeNull: Boolean) -> HttpClient) {
 
     suspend inline fun <reified T> execute(
         uri: Url,
         method: HttpMethod,
         headers: Headers = headersOf(),
-        body: Any? = null
+        body: Any? = null,
+        serializeNull: Boolean = true
     ): Result<PostgrestHttpResponse<T>> {
         try {
-            val callResult = httpClient.use { httpClient ->
+            val callResult = httpClient(serializeNull).use { httpClient ->
                 httpClient.request(uri) {
                     this.method = method
                     if (body != null) {
