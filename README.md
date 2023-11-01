@@ -1,7 +1,7 @@
 # Kotlin Client for PostgREST
 
 > **Warning**
-> This repository is archived. Use [supabase-kt](https://github.com/supabase-community/supabase-kt) instead to use Supabase in your Android application.
+> This repository is archived. Use [supabase-kt](https://github.com/supabase-community/supabase-kt) instead to use Supabase in your Kotlin projects.
 
 Kotlin JVM client for [PostgREST](https://postgrest.org/)
 
