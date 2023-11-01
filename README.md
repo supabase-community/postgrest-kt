@@ -1,5 +1,8 @@
 # Kotlin Client for PostgREST
 
+> **Warning**
+> This repository is archived. Use [supabase-kt](https://github.com/supabase-community/supabase-kt) instead.
+
 Kotlin JVM client for [PostgREST](https://postgrest.org/)
 
 ![Java CI with Gradle](https://img.shields.io/github/workflow/status/supabase/postgrest-kt/Java%20CI%20with%20Gradle?label=BUILD&style=for-the-badge)
