@@ -32,11 +32,23 @@ implementation 'io.supabase:postgrest-kt:{version}'
 
 ### Initializing the client
 
+## strings.xml
+```xml
+<resources>
+    <string name="base_url">https://1234.supabase.co/rest/v1</string>
+    <string name="supabase_url">db.1234.supabase.co</string>
+    <string name="supabase_key">eyJ1234c</string>
+</resources>
+```
+
+
 ```kotlin
-val postgrestClient =  PostgrestDefaultClient(
-    uri = URI("http://localhost:3111"),
-    headers = mapOf("Authorization" to "foobar")
+ var serviceKey: String = resources.getString(R.string.supabase_key);
+ val postgrestClient = PostgrestDefaultClient(
+      uri = URI(resources.getString(R.string.base_url)),
+      headers = mapOf("Authorization" to "Bearer $serviceKey", "apikey" to serviceKey)
 )
+        
 ```
 
 You can also pass in a custom schema using the `schema` parameter.
